@@ -1,7 +1,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <title>DomoMaker</title>
+  <title>am_radio</title>
   <script crossorigin src="https://unpkg.com/react@15/dist/react.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@15/dist/react-dom.min.js"></script>
   <script crossorigin src="https://unpkg.com/prop-types/prop-types.min.js"></script>
@@ -10,18 +10,37 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/remarkable/1.6.2/remarkable.min.js"></script>
   <link rel="shortcut icon" href="/assets/img/favicon.png"/>
   <link rel="stylesheet" type="text/css" href="/assets/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
-  <nav><a href="/login"><img id="logo" src="/assets/img/face.png" alt="face logo"/></a>
+  <div id="topNav">
+    <a href="/login" id="logo">am_radio</a>
+    <section id="loginContent"></section>
+    <section id="accountContent"></section>
+    <div class="navlink"><a id="loginButton" href="/login">Login</a></div>
+    <div class="navlink"><a id="signupButton" href="/signup">Sign up</a></div>
     <div class="navlink"><a href="/logout">Log out</a></div>
-  </nav>
-  <section id="makeDomo">
+  </div>
+  <div id="leftNav">
+    <ul>
+      <li><a href="" class="leftNavButts">All</a></li>
+      <li><a href="" class="leftNavButts">Mine</a></li>
+      <li><a href="" class="leftNavButts">Current</a></li>
+    </ul>
+  </div>
+  <div id="window">
+
+  </div>
+  <div id="botNav">
+
+  </div>
+  <!-- <section id="makeDomo">
   </section>
   <section id="domos">
   </section>
   <div id="domoMessage"><img id="speech" src="/assets/img/speech.png" alt="speech box"/>
     <h3><span id="errorMessage"></span></h3><img id="domo" src="assets/img/domo.png" alt="domo"/>
-  </div>
+  </div> -->
   <script src="/assets/bundle.js"></script>
 </body>
 </html>
