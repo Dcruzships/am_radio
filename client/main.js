@@ -1,4 +1,22 @@
-const setup = function(csrf) {
+const setup = function(csrf)
+{
+  const loginButton = document.querySelector("#loginButton");
+  const signupButton = document.querySelector("#signupButton");
+
+  signupButton.addEventListener("click", (e) => {
+    e.preventDefault();
+    createSignupWindow(csrf);
+    return false;
+  });
+
+  loginButton.addEventListener("click", (e) => {
+    e.preventDefault();
+    createLogin(csrf);
+    return false;
+  });
+
+  createLogin(csrf); //default view
+
   ReactDOM.render(
     <DomoForm csrf={csrf} />, document.querySelector("#makeDomo")
   );

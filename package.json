@@ -5,15 +5,12 @@
     "node": "12.13.0",
     "npm": "6.14.4"
   },
-  "description": "A radio application that uses Spotify playlists as streamable stations",
+  "description": "A radio application that uses Spotify playlists as streamable stations.",
   "main": "./server/app.js",
   "scripts": {
     "nodemon": "nodemon --watch ./server ./server/app.js",
-    "buildLoginBundle": "babel ./client/login ./client/helper --presets @babel/preset-react --out-file ./hosted/loginBundle.js",
-    "buildAppBundle": "babel ./client/app ./client/helper --presets @babel/preset-react --out-file ./hosted/bundle.js",
-    "build": "npm run buildLoginBundle && npm run buildAppBundle",
-    "watchLoginBundle": "babel --watch ./client/login ./client/helper --presets @babel/preset-react --out-file ./hosted/loginBundle.js",
-    "watchAppBundle": "babel --watch ./client/app ./client/helper --presets @babel/preset-react --out-file ./hosted/bundle.js",
+    "build": "gulp build",
+    "watch": "gulp watch",
     "start": "node ./server/app.js",
     "pretest": "eslint ./server --fix",
     "test": "echo \"Tests complete\""
@@ -22,12 +19,18 @@
     "Node",
     "MVC",
     "Redis",
-    "Login",
     "Radio",
     "AM"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Dcruzships/am_radio"
+  },
+  "bugs": {
+    "url": "https://github.com/Dcruzships/am_radio/my_package/issues"
+  },
   "author": "Brandon Dcruz",
-  "license": "Apache 2.0",
+  "license": "ISC",
   "devDependencies": {
     "@babel/cli": "^7.8.4",
     "@babel/core": "^7.8.7",
@@ -37,8 +40,15 @@
     "eslint": "^6.8.0",
     "eslint-config-airbnb": "^18.1.0",
     "eslint-plugin-import": "^2.20.1",
-    "nodemon": "^2.0.2",
-    "minimist": ">=0.2.1"
+    "gulp": "^4.0.2",
+    "gulp-babel": "^8.0.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-eslint": "^6.0.0",
+    "gulp-nodemon": "^2.5.0",
+    "gulp-sass": "^4.0.2",
+    "minimist": ">=0.2.1",
+    "node-sass": "^4.13.1",
+    "nodemon": "^2.0.2"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
@@ -51,6 +61,7 @@
     "express-session": "^1.17.0",
     "helmet": "^3.21.3",
     "mongoose": "^5.9.5",
+    "node-spotify-api": "^1.1.1",
     "redis": "^3.0.2",
     "serve-favicon": "^2.5.0",
     "underscore": "^1.9.2"

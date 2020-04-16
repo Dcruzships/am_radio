@@ -1,3 +1,28 @@
+const handleError = (message) => {
+  $("#errorMessage").text(message);
+  $("#domoMessage").animate({width: 'toggle'}, 350);
+};
+
+const redirect = (response) => {
+  $("#domoMessage").animate({width: 'hide'}, 350);
+  window.location = response.redirect;
+};
+
+const sendAjax = (type, action, data, success) => {
+  $.ajax({
+    cache: false,
+    type: type,
+    url: action,
+    data: data,
+    dataType: "json",
+    success: success,
+    error: function(xhr, status, error) {
+      var messageObj = JSON.parse(xhr.responseText);
+      handleError(messageObj.error);
+    }
+  });
+};
+
 const handleLogin = (e) => {
     e.preventDefault();
 
@@ -7,8 +32,6 @@ const handleLogin = (e) => {
       handleError("RAWR! Username or password is empty");
       return false;
     }
-
-    console.log($("input[name=_csrf]").val());
 
     sendAjax('POST', $("#loginForm").attr("action"), $("#loginForm").serialize(), redirect);
 
@@ -35,7 +58,7 @@ const handleSignup = (e) => {
     return false;
 };
 
-const LoginWindow = (props) => {
+const Login = (props) => {
   return (
     <form id="loginForm" name="loginForm"
           onSubmit={handleLogin}
@@ -49,7 +72,6 @@ const LoginWindow = (props) => {
       <input id="pass" type="password" name="pass" placeholder="password"/>
       <input type="hidden" name="_csrf" value={props.csrf}/>
       <input className="formSubmit" type="submit" value="Sign in" />
-
     </form>
   );
 };
@@ -75,37 +97,31 @@ const SignupWindow = (props) => {
   );
 };
 
-const createLoginWindow = (csrf) => {
+const AccountInfo = (props) => {
+  return(
+    <label htmlFor="username">Welcome </label>
+  );
+};
+
+const createLogin = (csrf) => {
   ReactDOM.render(
-    <LoginWindow csrf={csrf} />,
-    document.querySelector("#content")
+    <Login csrf={csrf} />,
+    document.querySelector("#accountContent")
+  );
+};
+
+const createAccountInfo = (csrf) => {
+  ReactDOM.render(
+    <AccountInfo csrf={csrf} />,
+    document.querySelector("#accountContent")
   );
 };
 
 const createSignupWindow = (csrf) => {
   ReactDOM.render(
     <SignupWindow csrf={csrf} />,
-    document.querySelector("#content")
+    document.querySelector("#signupContent")
   );
-};
-
-const setup = (csrf) => {
-  const loginButton = document.querySelector("#loginButton");
-  const signupButton = document.querySelector("#signupButton");
-
-  signupButton.addEventListener("click", (e) => {
-    e.preventDefault();
-    createSignupWindow(csrf);
-    return false;
-  });
-
-  loginButton.addEventListener("click", (e) => {
-    e.preventDefault();
-    createLoginwindow(csrf);
-    return false;
-  });
-
-  createLoginWindow(csrf); //default view
 };
 
 const getToken = () => {

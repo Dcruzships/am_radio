@@ -1,11 +1,27 @@
 const models = require('../models');
 
-const { Domo } = models;
+const { Playlist } = models;
 
-const makerPage = (req, res) => {
-  Domo.DomoModel.findByOwner(req.session.account._id, (err, docs) => {
+// Get all user playlists and post them to the window
+const myPlaylists = (request, response) =>
+{
+  const req = request;
+  const res = response;
+
+  return Playlist.PlaylistModel.findByOwner(req.session.account._id, (err, docs) => {
     if (err) {
       console.log(err);
+      return res.status(400).json({ error: 'An error occurred' });
+    }
+
+    return res.json({ playlists: docs });
+  });
+};
+
+// Get all public playlists and post them to the window
+const allPlaylists = (req, res) => {
+  Domo.DomoModel.findByOwner(req.session.account._id, (err, docs) => {
+    if (err) {
       return res.status(400).json({ error: 'An error occurred' });
     }
 
@@ -13,7 +29,8 @@ const makerPage = (req, res) => {
   });
 };
 
-const makeDomo = (req, res) => {
+// Create a new playlist and add it to the users playlists
+const newPlaylist = (req, res) => {
   if (!req.body.name || !req.body.age) {
     return res.status(400).json({ error: 'RAWR! Both name and age are required' });
   }
@@ -31,7 +48,6 @@ const makeDomo = (req, res) => {
   domoPromise.then(() => res.json({ redirect: '/maker' }));
 
   domoPromise.catch((err) => {
-    console.log(err);
     if (err.code === 11000) {
       return res.status(400).json({ error: 'Domo already exists.' });
     }
@@ -42,13 +58,9 @@ const makeDomo = (req, res) => {
   return domoPromise;
 };
 
-const getDomos = (request, response) => {
-  const req = request;
-  const res = response;
-
+const getMyPlaylists = (req, res) => {
   return Domo.DomoModel.findByOwner(req.session.account._id, (err, docs) => {
     if (err) {
-      console.log(err);
       return res.status(400).json({ error: 'An error occurred' });
     }
 
