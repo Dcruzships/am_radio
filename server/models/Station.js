@@ -3,14 +3,14 @@ const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 const _ = require('underscore');
 
-let DomoModel = {};
+let StationModel = {};
 
 // mongoose.Types.ObjectID is a function that
 // converts string ID to real mongo ID
 const convertId = mongoose.Types.ObjectId;
 const setName = (name) => _.escape(name).trim();
 
-const DomoSchema = new mongoose.Schema({
+const StationSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -18,38 +18,37 @@ const DomoSchema = new mongoose.Schema({
     set: setName,
   },
 
-  age: {
-    type: Number,
-    min: 0,
-    required: true,
-  },
-
-  owner: {
+  creator: {
     type: mongoose.Schema.ObjectId,
     required: true,
-    ref: 'Account',
+    ref: 'User',
   },
 
   createdData: {
     type: Date,
     default: Date.now,
   },
+
+  spotifyURI: {
+    type: String,
+    required: true,
+  },
 });
 
-DomoSchema.statics.toAPI = (doc) => ({
+StationSchema.statics.toAPI = (doc) => ({
   name: doc.name,
   age: doc.age,
 });
 
-DomoSchema.statics.findByOwner = (ownerId, callback) => {
+StationSchema.statics.findByCreator = (creatorID, callback) => {
   const search = {
-    owner: convertId(ownerId),
+    creator: convertId(creatorID),
   };
 
-  return DomoModel.find(search).select('name age').lean().exec(callback);
+  return StationModel.find(search).select('name spotifyURI').lean().exec(callback);
 };
 
-DomoModel = mongoose.model('Domo', DomoSchema);
+StationModel = mongoose.model('Station', StationSchema);
 
-module.exports.DomoModel = DomoModel;
-module.exports.DomoSchema = DomoSchema;
+module.exports.StationModel = StationModel;
+module.exports.StationSchema = StationSchema;

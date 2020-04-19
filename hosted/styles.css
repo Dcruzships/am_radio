@@ -1,0 +1,73 @@
+html, body {
+  height: 95vh;
+  width: 95vw;
+  margin: 1em;
+  padding: 0px;
+  overflow: hidden;
+  background-color: black; }
+
+.nav {
+  position: absolute;
+  margin: 0;
+  font: '$fontNav';
+  font-size: 35px;
+  background-color: white; }
+  .nav ul li {
+    margin: 0;
+    padding: 0;
+    float: left; }
+    .nav ul li a {
+      text-decoration: none;
+      padding: 10px 30px;
+      display: block;
+      color: black;
+      text-align: center; }
+      .nav ul li a:hover {
+        text-decoration: underline; }
+
+#topNav {
+  height: 125px;
+  width: 97%;
+  top: 2%; }
+  #topNav #logo {
+    position: absolute;
+    margin-left: .5em;
+    border-style: groove; }
+  #topNav ul {
+    margin-left: 100px;
+    padding-left: 150px;
+    list-style-type: none; }
+
+#leftNav {
+  top: 4em;
+  height: 70%;
+  width: 150px; }
+  #leftNav ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: square; }
+    #leftNav ul li a {
+      padding: 25px 25px;
+      display: block;
+      color: black;
+      text-align: center; }
+
+#rightNav {
+  top: 4em;
+  left: 90%;
+  height: 70%;
+  width: 150px; }
+  #rightNav ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: square; }
+    #rightNav ul li a {
+      padding: 25px 25px;
+      display: block;
+      color: black;
+      text-align: center; }
+
+#botNav {
+  top: 85%;
+  height: 125px;
+  width: 96.1%; }

@@ -1,0 +1,108 @@
+// Here we are defining two variables to store some style information
+$appWidth: 95vw;
+$appHeight: 95vh;
+$bgColor: black;
+$navColor: white;
+$fontNav: 'Roboto Mono';
+
+// SASS also allows us to create functions that we can use to dynamically
+// calculate styles at build time.
+@function calcDivMargin($width) {
+  @return $width / 4;
+}
+
+// Since SASS builds to css, we can write css as normal.
+html, body {
+  height: $appHeight;
+  width: $appWidth;
+  margin: 1em;
+  padding: 0px;
+  overflow: hidden;
+  background-color: $bgColor;
+}
+
+.nav {
+  position: absolute;
+  margin: 0;
+  font: '$fontNav';
+  font-size: 35px;
+  background-color: $navColor;
+  ul {
+    li {
+      margin: 0;
+      padding: 0;
+      float: left;
+      a {
+        &:hover{
+          text-decoration: underline;
+        }
+        text-decoration: none;
+        padding: 10px 30px;
+        display: block;
+        color: black;
+        text-align: center;
+      }
+    }
+  }
+}
+
+#topNav {
+  height: 125px;
+  width: 97%;
+  top: 2%;
+  #logo {
+    position: absolute;
+    margin-left: .5em;
+    border-style: groove;
+  }
+  ul {
+    margin-left: 100px;
+    padding-left: 150px;
+    list-style-type: none;
+  }
+}
+
+#leftNav {
+  top: 4em;
+  height: 70%;
+  width: 150px;
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: square;
+    li {
+      a {
+        padding: 25px 25px;
+        display: block;
+        color: black;
+        text-align: center;
+      }
+    }
+  }
+}
+
+#rightNav {
+  top: 4em;
+  left: 90%;
+  height: 70%;
+  width: 150px;
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: square;
+    li {
+      a {
+        padding: 25px 25px;
+        display: block;
+        color: black;
+        text-align: center;
+      }
+    }
+  }
+}
+
+#botNav {
+  top: 85%;
+  height: 125px;
+  width: 96.1%;
+}

@@ -9,34 +9,34 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/remarkable/1.6.2/remarkable.min.js"></script>
   <link rel="shortcut icon" href="/assets/img/favicon.png"/>
-  <link rel="stylesheet" type="text/css" href="/assets/style.css"/>
+  <link rel="stylesheet" type="text/css" href="/assets/styles.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+  <script src="/assets/bundle.js"></script>
 </head>
 <body>
-  <div id="topNav">
-    <a href="/" id="logo">am_radio</a>
-    <section id="accountContent"></section>
-    <div class="navlink"><a id="loginButton" href="/login">Login</a></div>
+  <div id="topNav" class="nav">
 
-    <div class="navlink"><a id="signupButton" href="/signup">Sign up</a></div>
-
-    <div class="navlink"><a href="/logout">Log out</a></div>
   </div>
 
-  <div id="leftNav">
+  <div id="leftNav" class="nav">
     <ul>
       <li><a href="/all" class="leftNavButts">All</a></li>
       <li><a href="/mine" class="leftNavButts">Mine</a></li>
       <li><a href="/station" class="leftNavButts">Station</a></li>
     </ul>
   </div>
+
+  <div id="botNav" class="nav">
+    <div id="audioControls"></div>
+  </div>
+
+  <div id="rightNav" class="nav">
+    <div id="playlistCreator"></div>
+  </div>
+
   <div id="window">
     <section id="signupContent"></section>
     <div id="playlists"></div>
   </div>
-  <div id="botNav">
-    <div id="audioControls"></div>
-  </div>
-  <script src="/assets/bundle.js"></script>
 </body>
 </html>
