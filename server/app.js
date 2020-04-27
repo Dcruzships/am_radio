@@ -7,12 +7,14 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const expressHandlebars = require('express-handlebars');
+const request = require('request');
+const querystring = require('query-string');
 // const csrf = require('csurf');
 
 // Redis
-// const redis = require('redis');
-// const session = require('express-session');
-// const RedisStore = require('connect-redis')(session);
+const redis = require('redis');
+const session = require('express-session');
+const RedisStore = require('connect-redis')(session);
 
 const config = require('./config.js');
 
@@ -33,7 +35,7 @@ mongoose.connect(config.connections.mongo, mongooseOptions, (err) => {
 });
 
 // Use config file
-// const redisClient = redis.createClient(config.connections.redis);
+const redisClient = redis.createClient(config.connections.redis);
 
 // pull in our routes
 const router = require('./router.js');
@@ -43,11 +45,24 @@ app.use('/assets', express.static(path.resolve(`${__dirname}/../hosted/`)));
 app.use(favicon(`${__dirname}/../hosted/img/favicon.png`));
 app.use(compression());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(session({
+  key: 'sessionid',
+  store: new RedisStore({
+    client: redisClient,
+  }),
+  secret: 'Domo Arigato',
+  resave: true,
+  saveUninitialized: true,
+  cookie: {
+    httpOnly: true,
+  },
+}));
 app.engine('handlebars', expressHandlebars({ defaultLayout: '' }));
 app.set('view engine', 'handlebars');
 app.set('views', `${__dirname}/../views`);
 app.disable('x-powered-by');
 app.use(cookieParser());
+
 
 router(app);
 

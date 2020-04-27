@@ -1,5 +1,13 @@
 "use strict";
 
+var _this = void 0;
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 var handleError = function handleError(message) {
   $("#errorMessage").text(message);
   $("#domoMessage").animate({
@@ -29,106 +37,175 @@ var sendAjax = function sendAjax(type, action, data, success) {
   });
 };
 
+var currentStation = 0;
+var currentVis = 0;
+var spotifyToken;
+var userPlaylists = [];
+var name;
+
 var init = function init() {
-  ReactDOM.render( /*#__PURE__*/React.createElement(TopNav, null), document.querySelector('#topNav')); // getAllStations();
+  var queryString = window.location.search;
+  var urlParams = new URLSearchParams(queryString);
+  spotifyToken = urlParams.get('access_token');
+
+  if (!spotifyToken) {
+    ReactDOM.render( /*#__PURE__*/React.createElement("button", {
+      id: "#loginButton",
+      onClick: function onClick(e) {
+        window.location = '/login';
+        isLogged = true;
+        e.preventDefault();
+        return false;
+      }
+    }, "Login with Spotify"), document.querySelector('#window'));
+  } else {
+    fetch('https://api.spotify.com/v1/me', {
+      headers: {
+        'Authorization': 'Bearer ' + spotifyToken
+      }
+    }).then(function (response) {
+      return response.json();
+    }).then(function (data) {
+      return name;
+    });
+    fetch('https://api.spotify.com/v1/me/playlists', {
+      headers: {
+        'Authorization': 'Bearer ' + spotifyToken
+      }
+    }).then(function (response) {
+      return response.json();
+    }).then(function (playlistData) {
+      var playlists = playlistData.items;
+      var trackDataPromises = playlists.map(function (playlist) {
+        var responsePromise = fetch(playlist.tracks.href, {
+          headers: {
+            'Authorization': 'Bearer ' + spotifyToken
+          }
+        });
+        var trackDataPromise = responsePromise.then(function (response) {
+          return response.json();
+        });
+        return trackDataPromise;
+      });
+      var allTracksDataPromises = Promise.all(trackDataPromises);
+      var playlistsPromise = allTracksDataPromises.then(function (trackDatas) {
+        trackDatas.forEach(function (trackData, i) {
+          playlists[i].trackDatas = trackData.items.map(function (item) {
+            return item.track;
+          }).map(function (trackData) {
+            return {
+              name: trackData.name,
+              duration: trackData.duration_ms / 1000
+            };
+          });
+        });
+        userPlaylists = playlists.slice();
+        return playlists;
+      });
+      return playlistsPromise;
+    });
+    ReactDOM.render( /*#__PURE__*/React.createElement(TopNav, null), document.querySelector('#topNav'));
+    ReactDOM.render( /*#__PURE__*/React.createElement(LeftNav, null), document.querySelector('#leftNav'));
+    ReactDOM.render( /*#__PURE__*/React.createElement(BotNav, null), document.querySelector('#botNav'));
+    ReactDOM.render( /*#__PURE__*/React.createElement(RightNav, null), document.querySelector('#rightNav'));
+  }
 };
 
 $(document).ready(function () {
   init();
 }); // This is where users login, links to account features. Sign in, sign out, create account
 
-var TopNav = function TopNav() {
+var TopNav = function TopNav(props) {
+  var name;
   return (/*#__PURE__*/React.createElement("div", {
-      id: "topNav"
-    }, /*#__PURE__*/React.createElement(Logo, null), /*#__PURE__*/React.createElement(LoginPanel, null))
-  );
-};
-
-var Logo = function Logo() {
-  return (/*#__PURE__*/React.createElement("a", {
+      id: "stations"
+    }, /*#__PURE__*/React.createElement("a", {
       href: "/",
       id: "logo"
-    }, "am_radio")
+    }, "am_radio"), /*#__PURE__*/React.createElement("img", {
+      id: "prevStation",
+      src: "https://img.icons8.com/material-two-tone/48/000000/double-left.png"
+    }), /*#__PURE__*/React.createElement("div", {
+      id: "stationNum"
+    }, "234"), /*#__PURE__*/React.createElement("img", {
+      id: "nextStation",
+      src: "https://img.icons8.com/material-two-tone/48/000000/double-right.png"
+    }))
   );
 };
 
-var LoginPanel = function LoginPanel() {
-  return (/*#__PURE__*/React.createElement("ul", null, /*#__PURE__*/React.createElement("li", {
-      className: "navlink"
-    }, /*#__PURE__*/React.createElement("input", {
-      id: "user",
-      type: "text",
-      name: "username",
-      placeholder: "username"
-    })), /*#__PURE__*/React.createElement("li", {
-      className: "navLink"
-    }, /*#__PURE__*/React.createElement("input", {
-      id: "pass",
-      type: "password",
-      name: "pass",
-      placeholder: "password"
-    })), /*#__PURE__*/React.createElement("li", {
-      className: "navlink"
-    }, /*#__PURE__*/React.createElement("a", {
-      id: "loginButton",
-      href: "/login"
-    }, "Login")), /*#__PURE__*/React.createElement("li", {
-      className: "navlink"
-    }, /*#__PURE__*/React.createElement("a", {
-      id: "signupButton",
-      href: "/signup"
-    }, "Sign up")))
+var LeftNav = function LeftNav() {
+  return (/*#__PURE__*/React.createElement("div", {
+      id: "stations"
+    }, /*#__PURE__*/React.createElement("ul", null, /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("a", {
+      href: "/all",
+      "class": "leftNavButts"
+    }, "All")), /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("a", {
+      href: "/mine",
+      "class": "leftNavButts"
+    }, "Mine")), /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("a", {
+      href: "/station",
+      "class": "leftNavButts"
+    }, "Station"))), /*#__PURE__*/React.createElement("div", {
+      id: "album"
+    }))
   );
 };
 
-var LogoutPanel = function LogoutPanel(props) {
-  return (/*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "Welcome ", props.username, "! "), /*#__PURE__*/React.createElement("ul", null, /*#__PURE__*/React.createElement("li", {
-      className: "navlink"
-    }, /*#__PURE__*/React.createElement("a", {
-      href: "/logout"
-    }, "Log out"))))
-  );
-};
-
-var SignupWindow = function SignupWindow(props) {
-  return (/*#__PURE__*/React.createElement("form", {
-      id: "signupForm",
-      name: "signupForm",
-      onSubmit: handleSignup,
-      action: "/signup",
+var RightNav = function RightNav(props) {
+  return (/*#__PURE__*/React.createElement("div", {
+      id: "newStationForm"
+    }, /*#__PURE__*/React.createElement("ul", null, /*#__PURE__*/React.createElement("form", {
+      id: "newStationForm",
+      name: "newStationForm",
+      onSubmit: handleNewStation,
+      action: "/NewStation",
       method: "POST",
       className: "mainForm"
     }, /*#__PURE__*/React.createElement("label", {
-      htmlFor: "username"
-    }, "Username: "), /*#__PURE__*/React.createElement("input", {
-      id: "user",
+      htmlFor: "stationName"
+    }, "Station Name: "), /*#__PURE__*/React.createElement("input", {
+      id: "stationName",
       type: "text",
-      name: "username",
-      placeholder: "username"
+      name: "stationName",
+      placeholder: "My Radio 101"
     }), /*#__PURE__*/React.createElement("label", {
-      htmlFor: "pass"
-    }, "Password: "), /*#__PURE__*/React.createElement("input", {
-      id: "pass",
-      type: "password",
-      name: "pass",
-      placeholder: "password"
-    }), /*#__PURE__*/React.createElement("label", {
-      htmlFor: "pass2"
-    }, "Password: "), /*#__PURE__*/React.createElement("input", {
-      id: "pass2",
-      type: "password",
-      name: "pass2",
-      placeholder: "retype password"
-    }), "// ", /*#__PURE__*/React.createElement("input", {
-      type: "hidden",
-      name: "_csrf",
-      value: props.csrf
-    }), "// ", /*#__PURE__*/React.createElement("input", {
+      htmlFor: "playlist"
+    }, "Playlist: "), /*#__PURE__*/React.createElement("select", {
+      id: "playlists",
+      name: "playlists"
+    }), /*#__PURE__*/React.createElement("input", {
       className: "formSubmit",
       type: "submit",
-      value: "Sign Up"
+      value: "Create Station"
+    }))))
+  );
+};
+
+var BotNav = function BotNav() {
+  return (/*#__PURE__*/React.createElement("div", {
+      id: "audioControls"
+    }, /*#__PURE__*/React.createElement("img", {
+      src: "https://img.icons8.com/wired/64/000000/play-button-circled.png"
+    }), /*#__PURE__*/React.createElement("img", {
+      src: "https://img.icons8.com/cotton/64/000000/circled-pause.png"
     }))
   );
+};
+
+var handleNewStation = function handleNewStation(e) {
+  e.preventDefault();
+  $("#domoMessage").animate({
+    width: 'hide'
+  }, 350);
+
+  if ($("#stationName").val() == '') {
+    handleError("Missing station name!");
+    return false;
+  }
+
+  sendAjax('POST', $("#newStationForm").attr("action"), $("#newStationForm").serialize(), redirect);
+  return false;
 };
 
 var StationList = function StationList(props) {
@@ -168,4 +245,62 @@ var getAllStations = function getAllStations() {
       stations: data.stations
     }), document.querySelector("#window"));
   });
+};
+
+var PlaylistCounter = function PlaylistCounter() {
+  return (/*#__PURE__*/React.createElement("div", {
+      style: {
+        width: "40%",
+        display: 'inline-block'
+      }
+    }, /*#__PURE__*/React.createElement("h2", null, _this.props.playlists.length, " playlists"))
+  );
+};
+
+var HoursCounter = function HoursCounter() {
+  var allSongs = _this.props.playlists.reduce(function (songs, eachPlaylist) {
+    return songs.concat(eachPlaylist.songs);
+  }, []);
+
+  var totalDuration = allSongs.reduce(function (sum, eachSong) {
+    return sum + eachSong.duration;
+  }, 0);
+  return (/*#__PURE__*/React.createElement("div", {
+      style: _objectSpread({}, defaultStyle, {
+        width: "40%",
+        display: 'inline-block'
+      })
+    }, /*#__PURE__*/React.createElement("h2", null, Math.round(totalDuration / 60), " hours"))
+  );
+};
+
+var Filter = function Filter() {
+  return (/*#__PURE__*/React.createElement("div", {
+      style: defaultStyle
+    }, /*#__PURE__*/React.createElement("img", null), /*#__PURE__*/React.createElement("input", {
+      type: "text",
+      onKeyUp: function onKeyUp(event) {
+        return _this.props.onTextChange(event.target.value);
+      }
+    }))
+  );
+};
+
+var Playlist = function Playlist() {
+  var playlist = _this.props.playlist;
+  return (/*#__PURE__*/React.createElement("div", {
+      style: _objectSpread({}, defaultStyle, {
+        display: 'inline-block',
+        width: "25%"
+      })
+    }, /*#__PURE__*/React.createElement("img", {
+      src: playlist.imageUrl,
+      style: {
+        width: '60px'
+      }
+    }), /*#__PURE__*/React.createElement("h3", null, playlist.name), /*#__PURE__*/React.createElement("ul", null, playlist.songs.map(function (song) {
+      return (/*#__PURE__*/React.createElement("li", null, song.name)
+      );
+    })))
+  );
 };

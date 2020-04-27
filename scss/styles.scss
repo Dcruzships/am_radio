@@ -5,6 +5,16 @@ $bgColor: black;
 $navColor: white;
 $fontNav: 'Roboto Mono';
 
+:root {
+  font-size: 16px;
+  font-family: $fontNav;
+  --text-primary: #b6b6b6;
+  --text-secondary: #ececec;
+  --bg-primary: #23232e;
+  --bg-secondary: #141418;
+  --transition-speed: 600ms;
+}
+
 // SASS also allows us to create functions that we can use to dynamically
 // calculate styles at build time.
 @function calcDivMargin($width) {
@@ -12,7 +22,7 @@ $fontNav: 'Roboto Mono';
 }
 
 // Since SASS builds to css, we can write css as normal.
-html, body {
+body {
   height: $appHeight;
   width: $appWidth;
   margin: 1em;
@@ -105,4 +115,12 @@ html, body {
   top: 85%;
   height: 125px;
   width: 96.1%;
+}
+
+#window {
+  position: absolute;
+  font-size: 30px;
+  color: black;
+  top: 25em;
+  left: 25em;
 }
