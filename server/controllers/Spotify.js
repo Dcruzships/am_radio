@@ -14,7 +14,7 @@ const login = (req, res) => {
       response_type: 'code',
       client_id: process.env.SPOTIFY_CLIENT_ID,
       scope: scopes,
-      redirect_uri: `${process.env.FRONTEND_URI}/callback`,
+      redirect_uri: process.env.REDIRECT_URI,
     })}`);
 };
 
@@ -24,7 +24,7 @@ const callback = (req, res) => {
     url: 'https://accounts.spotify.com/api/token',
     form: {
       code,
-      redirect_uri: `${process.env.FRONTEND_URI}/callback`,
+      redirect_uri: process.env.REDIRECT_URI,
       grant_type: 'authorization_code',
     },
     headers: {
