@@ -1,4 +1,4 @@
-//CHANGE FOR FINAL REDIRECT
+// CHANGE FOR FINAL REDIRECT
 // process.env.REDIRECT_URI
 
 const querystring = require('query-string');
@@ -12,24 +12,22 @@ const scopes = [
 ];
 
 const login = (req, res) => {
-  const redURI = `${process.env.REDIRECT_URI}` || `http://localhost:3000/callback`
   res.redirect(`https://accounts.spotify.com/authorize?${
     querystring.stringify({
       response_type: 'code',
       client_id: process.env.SPOTIFY_CLIENT_ID,
       scope: scopes,
-      redirect_uri: redURI,
+      redirect_uri: process.env.REDIRECT_URI,
     })}`);
 };
 
 const callback = (req, res) => {
   const code = req.query.code || null;
-  const redURI = `${process.env.REDIRECT_URI}` || `http://localhost:3000/callback`
   const authOptions = {
     url: 'https://accounts.spotify.com/api/token',
     form: {
       code,
-      redirect_uri: redURI,
+      redirect_uri: process.env.REDIRECT_URI,
       grant_type: 'authorization_code',
     },
     headers: {
@@ -41,7 +39,7 @@ const callback = (req, res) => {
   };
 
   request.post(authOptions, (error, response, body) => {
-    const uri = `${process.env.FRONTEND_URI}` || `https://localhost:3000`;
+    const uri = process.env.FRONTEND_URI;
     res.redirect(`${uri}?access_token=${body.access_token}`);
   });
 };
