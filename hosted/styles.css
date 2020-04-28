@@ -34,14 +34,13 @@ body {
       .nav ul li a:hover {
         text-decoration: underline; }
 
+.topNavLink {
+  display: inline-block; }
+
 #topNav {
   height: 125px;
   width: 97%;
   top: 2%; }
-  #topNav #logo {
-    position: absolute;
-    margin-left: .5em;
-    border-style: groove; }
   #topNav ul {
     margin-left: 100px;
     padding-left: 150px;

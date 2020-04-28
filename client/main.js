@@ -1,8 +1,8 @@
 let currentStation = 0;
 let currentVis = 0;
 let spotifyToken;
-let userPlaylists = [];
-let name;
+let userPlaylists;
+let userName = "";
 
 const init = () =>
 {
@@ -27,7 +27,7 @@ const init = () =>
     fetch('https://api.spotify.com/v1/me', {
       headers: {'Authorization': 'Bearer ' + spotifyToken}
     }).then(response => response.json())
-    .then(data => name);
+    .then(data => createTopNav(data.display_name));
 
     fetch('https://api.spotify.com/v1/me/playlists', {
       headers: {'Authorization': 'Bearer ' + spotifyToken}
@@ -53,18 +53,26 @@ const init = () =>
               duration: trackData.duration_ms / 1000
             }))
         })
-        userPlaylists = playlists.slice();
         return playlists;
-      })
+      }).then(data => createRightNav(data))
       return playlistsPromise;
-    })
+    });
 
-    ReactDOM.render(<TopNav />, document.querySelector('#topNav'));
     ReactDOM.render(<LeftNav />, document.querySelector('#leftNav'));
     ReactDOM.render(<BotNav />, document.querySelector('#botNav'));
-    ReactDOM.render(<RightNav />, document.querySelector('#rightNav'));
+
   }
 };
+
+const createTopNav = (data) =>
+{
+  ReactDOM.render(<TopNav name={data} />, document.querySelector('#topNav'));
+}
+
+const createRightNav = (data) =>
+{
+  ReactDOM.render(<RightNav playlists={data} />, document.querySelector('#rightNav'));
+}
 
 $(document).ready(function() {
   init();

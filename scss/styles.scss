@@ -56,15 +56,14 @@ body {
   }
 }
 
+.topNavLink {
+  display: inline-block;
+}
+
 #topNav {
   height: 125px;
   width: 97%;
   top: 2%;
-  #logo {
-    position: absolute;
-    margin-left: .5em;
-    border-style: groove;
-  }
   ul {
     margin-left: 100px;
     padding-left: 150px;

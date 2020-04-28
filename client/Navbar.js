@@ -1,14 +1,13 @@
 // This is where users login, links to account features. Sign in, sign out, create account
 const TopNav = (props) =>
 {
-  let name;
-
   return(
     <div id="stations">
-      <a href="/" id="logo">am_radio</a>
-      <img id="prevStation" src="https://img.icons8.com/material-two-tone/48/000000/double-left.png"></img>
-      <div id="stationNum">234</div>
-      <img id="nextStation" src="https://img.icons8.com/material-two-tone/48/000000/double-right.png"></img>
+      <a className="topNavLink" href="/" id="logo">am_radio</a>
+      <img className="topNavLink" id="prevStation" src="https://img.icons8.com/material-two-tone/48/000000/double-left.png"></img>
+      <div className="topNavLink" id="stationNum">234</div>
+      <img className="topNavLink" id="nextStation" src="https://img.icons8.com/material-two-tone/48/000000/double-right.png"></img>
+      <p className="topNavLink" id="name">Hello {props.name}</p>
     </div>
   );
 };
@@ -29,6 +28,26 @@ const LeftNav = () =>
 
 const RightNav = (props) =>
 {
+  const buildOptions = () =>
+  {
+    let playlistNames = [];
+    let playlistIDs = [];
+    let optionsArray = [];
+
+    for(let i = 0; i < props.playlists.length; i++)
+    {
+      playlistNames.push(props.playlists[i].name);
+      playlistIDs.push(props.playlists[i].name);
+
+      optionsArray.push(<option key={playlistIDs[i]} value={playlistNames[i]}>{playlistIDs[i]}</option>);
+    }
+
+    // for (let i = 1; i <= 10; i++) {
+    //     arr.push(<option key={i} value="{i}">{i}</option>)
+    // }
+    // {props.playlists.map((x) => <option key={y}>{x}</option>)}
+    return optionsArray;
+  }
   return (
     <div id="newStationForm">
       <ul>
@@ -40,7 +59,9 @@ const RightNav = (props) =>
           <label htmlFor="stationName">Station Name: </label>
           <input id="stationName" type="text" name="stationName" placeholder="My Radio 101"/>
           <label htmlFor="playlist">Playlist: </label>
-            <select id="playlists" name="playlists"></select>
+            <select>
+              {buildOptions()}
+            </select>;
           <input className="formSubmit" type="submit" value="Create Station" />
         </form>
       </ul>

@@ -40,8 +40,8 @@ var sendAjax = function sendAjax(type, action, data, success) {
 var currentStation = 0;
 var currentVis = 0;
 var spotifyToken;
-var userPlaylists = [];
-var name;
+var userPlaylists;
+var userName = "";
 
 var init = function init() {
   var queryString = window.location.search;
@@ -66,7 +66,7 @@ var init = function init() {
     }).then(function (response) {
       return response.json();
     }).then(function (data) {
-      return name;
+      return createTopNav(data.display_name);
     });
     fetch('https://api.spotify.com/v1/me/playlists', {
       headers: {
@@ -99,16 +99,27 @@ var init = function init() {
             };
           });
         });
-        userPlaylists = playlists.slice();
         return playlists;
+      }).then(function (data) {
+        return createRightNav(data);
       });
       return playlistsPromise;
     });
-    ReactDOM.render( /*#__PURE__*/React.createElement(TopNav, null), document.querySelector('#topNav'));
     ReactDOM.render( /*#__PURE__*/React.createElement(LeftNav, null), document.querySelector('#leftNav'));
     ReactDOM.render( /*#__PURE__*/React.createElement(BotNav, null), document.querySelector('#botNav'));
-    ReactDOM.render( /*#__PURE__*/React.createElement(RightNav, null), document.querySelector('#rightNav'));
   }
+};
+
+var createTopNav = function createTopNav(data) {
+  ReactDOM.render( /*#__PURE__*/React.createElement(TopNav, {
+    name: data
+  }), document.querySelector('#topNav'));
+};
+
+var createRightNav = function createRightNav(data) {
+  ReactDOM.render( /*#__PURE__*/React.createElement(RightNav, {
+    playlists: data
+  }), document.querySelector('#rightNav'));
 };
 
 $(document).ready(function () {
@@ -116,21 +127,27 @@ $(document).ready(function () {
 }); // This is where users login, links to account features. Sign in, sign out, create account
 
 var TopNav = function TopNav(props) {
-  var name;
   return (/*#__PURE__*/React.createElement("div", {
       id: "stations"
     }, /*#__PURE__*/React.createElement("a", {
+      className: "topNavLink",
       href: "/",
       id: "logo"
     }, "am_radio"), /*#__PURE__*/React.createElement("img", {
+      className: "topNavLink",
       id: "prevStation",
       src: "https://img.icons8.com/material-two-tone/48/000000/double-left.png"
     }), /*#__PURE__*/React.createElement("div", {
+      className: "topNavLink",
       id: "stationNum"
     }, "234"), /*#__PURE__*/React.createElement("img", {
+      className: "topNavLink",
       id: "nextStation",
       src: "https://img.icons8.com/material-two-tone/48/000000/double-right.png"
-    }))
+    }), /*#__PURE__*/React.createElement("p", {
+      className: "topNavLink",
+      id: "name"
+    }, "Hello ", props.name))
   );
 };
 
@@ -153,6 +170,27 @@ var LeftNav = function LeftNav() {
 };
 
 var RightNav = function RightNav(props) {
+  var buildOptions = function buildOptions() {
+    var playlistNames = [];
+    var playlistIDs = [];
+    var optionsArray = [];
+
+    for (var i = 0; i < props.playlists.length; i++) {
+      playlistNames.push(props.playlists[i].name);
+      playlistIDs.push(props.playlists[i].name);
+      optionsArray.push( /*#__PURE__*/React.createElement("option", {
+        key: playlistIDs[i],
+        value: playlistNames[i]
+      }, playlistIDs[i]));
+    } // for (let i = 1; i <= 10; i++) {
+    //     arr.push(<option key={i} value="{i}">{i}</option>)
+    // }
+    // {props.playlists.map((x) => <option key={y}>{x}</option>)}
+
+
+    return optionsArray;
+  };
+
   return (/*#__PURE__*/React.createElement("div", {
       id: "newStationForm"
     }, /*#__PURE__*/React.createElement("ul", null, /*#__PURE__*/React.createElement("form", {
@@ -171,10 +209,7 @@ var RightNav = function RightNav(props) {
       placeholder: "My Radio 101"
     }), /*#__PURE__*/React.createElement("label", {
       htmlFor: "playlist"
-    }, "Playlist: "), /*#__PURE__*/React.createElement("select", {
-      id: "playlists",
-      name: "playlists"
-    }), /*#__PURE__*/React.createElement("input", {
+    }, "Playlist: "), /*#__PURE__*/React.createElement("select", null, buildOptions()), ";", /*#__PURE__*/React.createElement("input", {
       className: "formSubmit",
       type: "submit",
       value: "Create Station"
