@@ -5,7 +5,7 @@ const TopNav = (props) =>
     <div id="stations">
       <a className="topNavLink" href="/" id="logo">am_radio</a>
       <img className="topNavLink" id="prevStation" src="https://img.icons8.com/material-two-tone/48/000000/double-left.png"></img>
-      <div className="topNavLink" id="stationNum">234</div>
+      <div className="topNavLink" id="stationNum">{currentStation}</div>
       <img className="topNavLink" id="nextStation" src="https://img.icons8.com/material-two-tone/48/000000/double-right.png"></img>
       <p className="topNavLink" id="name">Hello {props.name}</p>
     </div>
@@ -28,6 +28,14 @@ const LeftNav = () =>
 
 const RightNav = (props) =>
 {
+  const handleChange = (event) =>
+  {
+    console.log("value: " + event.value);
+    console.log("target: " + event.target.value);
+    event.value = event.target.value;
+    event.target.name = 'playlistID';
+  }
+
   const buildOptions = () =>
   {
     let playlistNames = [];
@@ -37,32 +45,32 @@ const RightNav = (props) =>
     for(let i = 0; i < props.playlists.length; i++)
     {
       playlistNames.push(props.playlists[i].name);
-      playlistIDs.push(props.playlists[i].name);
+      playlistIDs.push(props.playlists[i].uri);
+      optionsArray.push(<option key={playlistNames[i]} value={playlistIDs[i]}>{playlistNames[i]}</option>);
 
-      optionsArray.push(<option key={playlistIDs[i]} value={playlistNames[i]}>{playlistIDs[i]}</option>);
     }
-
-    // for (let i = 1; i <= 10; i++) {
-    //     arr.push(<option key={i} value="{i}">{i}</option>)
-    // }
-    // {props.playlists.map((x) => <option key={y}>{x}</option>)}
     return optionsArray;
   }
+
   return (
-    <div id="newStationForm">
+    <div>
       <ul>
-        <form id="newStationForm" name="newStationForm"
-        onSubmit={handleNewStation}
-        action="/NewStation"
-        method="POST"
-        className="mainForm">
-          <label htmlFor="stationName">Station Name: </label>
+        <form id="newStationForm"
+              name="newStationForm"
+              onSubmit={handleNewStation}
+              action="/create"
+              method="POST"
+              className="stationForm"
+        >
+          <label id="stationLabel">Station Name: </label>
           <input id="stationName" type="text" name="stationName" placeholder="My Radio 101"/>
-          <label htmlFor="playlist">Playlist: </label>
-            <select>
+          <label id="playlistLabel">Playlist: </label>
+            <select id="playlistID" onChange={handleChange}>
               {buildOptions()}
-            </select>;
-          <input className="formSubmit" type="submit" value="Create Station" />
+            </select>
+          <input type="hidden" name="user" value={userName}/>
+          <input type="hidden" name="stationNum" value={currentStation}/>
+          <input className="createStationSubmit" type="submit" value="Create Station"/>
         </form>
       </ul>
     </div>
@@ -82,14 +90,15 @@ const BotNav = () =>
 const handleNewStation = (e) => {
     e.preventDefault();
 
-    $("#domoMessage").animate({width:'hide'}, 350);
-
-    if ($("#stationName").val() == '') {
-      handleError("Missing station name!");
+    if ($("#stationName").val() == '')
+    {
+      console.log("missing name");
       return false;
     }
 
-    sendAjax('POST', $("#newStationForm").attr("action"), $("#newStationForm").serialize(), redirect);
+    sendAjax('POST', $("#newStationForm").attr("action"), $("#newStationForm").serialize(), redirect, function() {
+      loadStation();
+    });
 
     return false;
 };

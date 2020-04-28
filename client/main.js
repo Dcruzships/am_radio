@@ -10,6 +10,9 @@ const init = () =>
   const urlParams = new URLSearchParams(queryString);
   spotifyToken = urlParams.get('access_token');
 
+  currentStation = Math.floor(Math.random() * 990);
+  currentStation = ('000' + currentStation).substr(-3);
+
   if(!spotifyToken)
   {
     ReactDOM.render(
@@ -60,19 +63,26 @@ const init = () =>
 
     ReactDOM.render(<LeftNav />, document.querySelector('#leftNav'));
     ReactDOM.render(<BotNav />, document.querySelector('#botNav'));
-
   }
 };
 
 const createTopNav = (data) =>
 {
+  userName = data;
   ReactDOM.render(<TopNav name={data} />, document.querySelector('#topNav'));
-}
+};
 
 const createRightNav = (data) =>
 {
+  userPlaylists = data;
   ReactDOM.render(<RightNav playlists={data} />, document.querySelector('#rightNav'));
-}
+};
+
+const loadStation = (stationNum) => {
+  sendAjax('GET', '/getStation', stationNum, (data) => {
+
+  });
+};
 
 $(document).ready(function() {
   init();

@@ -18,6 +18,12 @@ const StationSchema = new mongoose.Schema({
     set: setName,
   },
 
+  num: {
+    type: Number,
+    minimum: 0,
+    maximum: 999,
+  },
+
   creator: {
     type: mongoose.Schema.ObjectId,
     required: true,

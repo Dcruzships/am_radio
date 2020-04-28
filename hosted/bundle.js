@@ -16,9 +16,7 @@ var handleError = function handleError(message) {
 };
 
 var redirect = function redirect(response) {
-  $("#domoMessage").animate({
-    width: 'hide'
-  }, 350);
+  // $("#domoMessage").animate({width: 'hide'}, 350);
   window.location = response.redirect;
 };
 
@@ -32,7 +30,7 @@ var sendAjax = function sendAjax(type, action, data, success) {
     success: success,
     error: function error(xhr, status, _error) {
       var messageObj = JSON.parse(xhr.responseText);
-      handleError(messageObj.error);
+      console.log(messageObj);
     }
   });
 };
@@ -47,6 +45,8 @@ var init = function init() {
   var queryString = window.location.search;
   var urlParams = new URLSearchParams(queryString);
   spotifyToken = urlParams.get('access_token');
+  currentStation = Math.floor(Math.random() * 990);
+  currentStation = ('000' + currentStation).substr(-3);
 
   if (!spotifyToken) {
     ReactDOM.render( /*#__PURE__*/React.createElement("button", {
@@ -111,15 +111,21 @@ var init = function init() {
 };
 
 var createTopNav = function createTopNav(data) {
+  userName = data;
   ReactDOM.render( /*#__PURE__*/React.createElement(TopNav, {
     name: data
   }), document.querySelector('#topNav'));
 };
 
 var createRightNav = function createRightNav(data) {
+  userPlaylists = data;
   ReactDOM.render( /*#__PURE__*/React.createElement(RightNav, {
     playlists: data
   }), document.querySelector('#rightNav'));
+};
+
+var loadStation = function loadStation(stationNum) {
+  sendAjax('GET', '/getStation', stationNum, function (data) {});
 };
 
 $(document).ready(function () {
@@ -140,7 +146,7 @@ var TopNav = function TopNav(props) {
     }), /*#__PURE__*/React.createElement("div", {
       className: "topNavLink",
       id: "stationNum"
-    }, "234"), /*#__PURE__*/React.createElement("img", {
+    }, currentStation), /*#__PURE__*/React.createElement("img", {
       className: "topNavLink",
       id: "nextStation",
       src: "https://img.icons8.com/material-two-tone/48/000000/double-right.png"
@@ -170,6 +176,13 @@ var LeftNav = function LeftNav() {
 };
 
 var RightNav = function RightNav(props) {
+  var handleChange = function handleChange(event) {
+    console.log("value: " + event.value);
+    console.log("target: " + event.target.value);
+    event.value = event.target.value;
+    event.target.name = 'playlistID';
+  };
+
   var buildOptions = function buildOptions() {
     var playlistNames = [];
     var playlistIDs = [];
@@ -177,40 +190,45 @@ var RightNav = function RightNav(props) {
 
     for (var i = 0; i < props.playlists.length; i++) {
       playlistNames.push(props.playlists[i].name);
-      playlistIDs.push(props.playlists[i].name);
+      playlistIDs.push(props.playlists[i].uri);
       optionsArray.push( /*#__PURE__*/React.createElement("option", {
-        key: playlistIDs[i],
-        value: playlistNames[i]
-      }, playlistIDs[i]));
-    } // for (let i = 1; i <= 10; i++) {
-    //     arr.push(<option key={i} value="{i}">{i}</option>)
-    // }
-    // {props.playlists.map((x) => <option key={y}>{x}</option>)}
-
+        key: playlistNames[i],
+        value: playlistIDs[i]
+      }, playlistNames[i]));
+    }
 
     return optionsArray;
   };
 
-  return (/*#__PURE__*/React.createElement("div", {
-      id: "newStationForm"
-    }, /*#__PURE__*/React.createElement("ul", null, /*#__PURE__*/React.createElement("form", {
+  return (/*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("ul", null, /*#__PURE__*/React.createElement("form", {
       id: "newStationForm",
       name: "newStationForm",
       onSubmit: handleNewStation,
-      action: "/NewStation",
+      action: "/create",
       method: "POST",
-      className: "mainForm"
+      className: "stationForm"
     }, /*#__PURE__*/React.createElement("label", {
-      htmlFor: "stationName"
+      id: "stationLabel"
     }, "Station Name: "), /*#__PURE__*/React.createElement("input", {
       id: "stationName",
       type: "text",
       name: "stationName",
       placeholder: "My Radio 101"
     }), /*#__PURE__*/React.createElement("label", {
-      htmlFor: "playlist"
-    }, "Playlist: "), /*#__PURE__*/React.createElement("select", null, buildOptions()), ";", /*#__PURE__*/React.createElement("input", {
-      className: "formSubmit",
+      id: "playlistLabel"
+    }, "Playlist: "), /*#__PURE__*/React.createElement("select", {
+      id: "playlistID",
+      onChange: handleChange
+    }, buildOptions()), /*#__PURE__*/React.createElement("input", {
+      type: "hidden",
+      name: "user",
+      value: userName
+    }), /*#__PURE__*/React.createElement("input", {
+      type: "hidden",
+      name: "stationNum",
+      value: currentStation
+    }), /*#__PURE__*/React.createElement("input", {
+      className: "createStationSubmit",
       type: "submit",
       value: "Create Station"
     }))))
@@ -230,16 +248,15 @@ var BotNav = function BotNav() {
 
 var handleNewStation = function handleNewStation(e) {
   e.preventDefault();
-  $("#domoMessage").animate({
-    width: 'hide'
-  }, 350);
 
   if ($("#stationName").val() == '') {
-    handleError("Missing station name!");
+    console.log("missing name");
     return false;
   }
 
-  sendAjax('POST', $("#newStationForm").attr("action"), $("#newStationForm").serialize(), redirect);
+  sendAjax('POST', $("#newStationForm").attr("action"), $("#newStationForm").serialize(), redirect, function () {
+    loadStation();
+  });
   return false;
 };
 

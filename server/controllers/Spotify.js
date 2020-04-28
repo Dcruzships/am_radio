@@ -12,22 +12,24 @@ const scopes = [
 ];
 
 const login = (req, res) => {
+  const redURI = `${process.env.REDIRECT_URI}` || `http://localhost:3000/callback`
   res.redirect(`https://accounts.spotify.com/authorize?${
     querystring.stringify({
       response_type: 'code',
       client_id: process.env.SPOTIFY_CLIENT_ID,
       scope: scopes,
-      redirect_uri: process.env.REDIRECT_URI,
+      redirect_uri: redURI,
     })}`);
 };
 
 const callback = (req, res) => {
   const code = req.query.code || null;
+  const redURI = `${process.env.REDIRECT_URI}` || `http://localhost:3000/callback`
   const authOptions = {
     url: 'https://accounts.spotify.com/api/token',
     form: {
       code,
-      redirect_uri: process.env.REDIRECT_URI,
+      redirect_uri: redURI,
       grant_type: 'authorization_code',
     },
     headers: {
