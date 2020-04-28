@@ -1,12 +1,12 @@
-const crypto = require('crypto');
+// const crypto = require('crypto');
 const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
 
 let AccountModel = {};
-const iterations = 10000;
-const saltLength = 64;
-const keyLength = 64;
+// const iterations = 10000;
+// const saltLength = 64;
+// const keyLength = 64;
 
 const AccountSchema = new mongoose.Schema({
   spotifyID: {
@@ -16,7 +16,7 @@ const AccountSchema = new mongoose.Schema({
     unique: true,
     match: /^[A-Za-z0-9_\-.]{1,16}$/,
   },
-  auth : {
+  auth: {
     type: Array,
     required: true,
   },

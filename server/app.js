@@ -7,8 +7,6 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const expressHandlebars = require('express-handlebars');
-const request = require('request');
-const querystring = require('query-string');
 // const csrf = require('csurf');
 
 // Redis
