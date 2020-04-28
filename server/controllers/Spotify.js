@@ -1,3 +1,6 @@
+//CHANGE FOR FINAL REDIRECT
+// process.env.REDIRECT_URI
+
 const querystring = require('query-string');
 const request = require('request');
 
@@ -14,7 +17,7 @@ const login = (req, res) => {
       response_type: 'code',
       client_id: process.env.SPOTIFY_CLIENT_ID,
       scope: scopes,
-      redirect_uri: process.env.REDIRECT_URI,
+      redirect_uri: 'http://localhost:3000/callback',
     })}`);
 };
 
@@ -24,7 +27,7 @@ const callback = (req, res) => {
     url: 'https://accounts.spotify.com/api/token',
     form: {
       code,
-      redirect_uri: process.env.REDIRECT_URI,
+      redirect_uri: 'http://localhost:3000/callback',
       grant_type: 'authorization_code',
     },
     headers: {
