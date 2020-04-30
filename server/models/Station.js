@@ -11,26 +11,25 @@ const convertId = mongoose.Types.ObjectId;
 const setName = (name) => _.escape(name).trim();
 
 const StationSchema = new mongoose.Schema({
-  name: {
+  stationName: {
     type: String,
     required: true,
     trim: true,
     set: setName,
   },
 
-  num: {
+  stationNum: {
     type: Number,
     minimum: 0,
     maximum: 999,
   },
 
-  creator: {
-    type: mongoose.Schema.ObjectId,
+  userID: {
+    type: String,
     required: true,
-    ref: 'User',
   },
 
-  createdData: {
+  createdDate: {
     type: Date,
     default: Date.now,
   },
@@ -42,13 +41,15 @@ const StationSchema = new mongoose.Schema({
 });
 
 StationSchema.statics.toAPI = (doc) => ({
-  name: doc.name,
-  age: doc.age,
+  stationName: doc.stationName,
+  stationNum: doc.stationNum,
+  userID: doc.userID,
+  spotifyURI: doc.spotifyURI,
 });
 
-StationSchema.statics.findByCreator = (creatorID, callback) => {
+StationSchema.statics.findByCreator = (userID, callback) => {
   const search = {
-    creator: convertId(creatorID),
+    userID: convertId(userID),
   };
 
   return StationModel.find(search).select('name spotifyURI').lean().exec(callback);

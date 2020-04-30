@@ -10,8 +10,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 var handleError = function handleError(message) {
   $("#errorMessage").text(message);
-  $("#domoMessage").animate({
-    width: 'toggle'
+  $("#errorMessage").animate({
+    opacity: 0.25
   }, 350);
 };
 
@@ -39,12 +39,19 @@ var currentStation = 0;
 var currentVis = 0;
 var spotifyToken;
 var userPlaylists;
-var userName = "";
+var userID = "";
+var displayName = "";
+var changeStation = false;
 
 var init = function init() {
   var queryString = window.location.search;
   var urlParams = new URLSearchParams(queryString);
   spotifyToken = urlParams.get('access_token');
+
+  if (spotifyToken == null) {
+    spotifyToken = getCookie("spotifyToken");
+  }
+
   currentStation = Math.floor(Math.random() * 990);
   currentStation = ('000' + currentStation).substr(-3);
 
@@ -59,61 +66,79 @@ var init = function init() {
       }
     }, "Login with Spotify"), document.querySelector('#window'));
   } else {
-    fetch('https://api.spotify.com/v1/me', {
-      headers: {
-        'Authorization': 'Bearer ' + spotifyToken
-      }
-    }).then(function (response) {
-      return response.json();
-    }).then(function (data) {
-      return createTopNav(data.display_name);
-    });
-    fetch('https://api.spotify.com/v1/me/playlists', {
-      headers: {
-        'Authorization': 'Bearer ' + spotifyToken
-      }
-    }).then(function (response) {
-      return response.json();
-    }).then(function (playlistData) {
-      var playlists = playlistData.items;
-      var trackDataPromises = playlists.map(function (playlist) {
-        var responsePromise = fetch(playlist.tracks.href, {
-          headers: {
-            'Authorization': 'Bearer ' + spotifyToken
-          }
-        });
-        var trackDataPromise = responsePromise.then(function (response) {
-          return response.json();
-        });
-        return trackDataPromise;
-      });
-      var allTracksDataPromises = Promise.all(trackDataPromises);
-      var playlistsPromise = allTracksDataPromises.then(function (trackDatas) {
-        trackDatas.forEach(function (trackData, i) {
-          playlists[i].trackDatas = trackData.items.map(function (item) {
-            return item.track;
-          }).map(function (trackData) {
-            return {
-              name: trackData.name,
-              duration: trackData.duration_ms / 1000
-            };
-          });
-        });
-        return playlists;
-      }).then(function (data) {
-        return createRightNav(data);
-      });
-      return playlistsPromise;
-    });
-    ReactDOM.render( /*#__PURE__*/React.createElement(LeftNav, null), document.querySelector('#leftNav'));
-    ReactDOM.render( /*#__PURE__*/React.createElement(BotNav, null), document.querySelector('#botNav'));
+    document.querySelector("#window").innerHTML = "<h3><span id='errorMessage'></span></h3>";
+    document.cookie = "spotifyToken=".concat(spotifyToken);
+    makeNav();
+    setControls(); // loadStation();
   }
 };
 
+var makeNav = function makeNav() {
+  fetch('https://api.spotify.com/v1/me', {
+    headers: {
+      'Authorization': 'Bearer ' + spotifyToken
+    }
+  }).then(function (response) {
+    return response.json();
+  }).then(function (data) {
+    return createTopNav(data);
+  });
+  fetch('https://api.spotify.com/v1/me/playlists', {
+    headers: {
+      'Authorization': 'Bearer ' + spotifyToken
+    }
+  }).then(function (response) {
+    return response.json();
+  }).then(function (playlistData) {
+    var playlists = playlistData.items;
+    var trackDataPromises = playlists.map(function (playlist) {
+      var responsePromise = fetch(playlist.tracks.href, {
+        headers: {
+          'Authorization': 'Bearer ' + spotifyToken
+        }
+      });
+      var trackDataPromise = responsePromise.then(function (response) {
+        return response.json();
+      });
+      return trackDataPromise;
+    });
+    var allTracksDataPromises = Promise.all(trackDataPromises);
+    var playlistsPromise = allTracksDataPromises.then(function (trackDatas) {
+      trackDatas.forEach(function (trackData, i) {
+        playlists[i].trackDatas = trackData.items.map(function (item) {
+          return item.track;
+        }).map(function (trackData) {
+          return {
+            name: trackData.name,
+            duration: trackData.duration_ms / 1000
+          };
+        });
+      });
+      return playlists;
+    }).then(function (data) {
+      return createRightNav(data);
+    });
+    return playlistsPromise;
+  });
+  ReactDOM.render( /*#__PURE__*/React.createElement(LeftNav, null), document.querySelector('#leftNav'));
+  ReactDOM.render( /*#__PURE__*/React.createElement(BotNav, null), document.querySelector('#botNav'));
+};
+
+var setControls = function setControls() {
+  var stationNumLabel = document.querySelector("#stationNum");
+};
+
 var createTopNav = function createTopNav(data) {
-  userName = data;
+  if (data.error != undefined) {
+    document.cookie = 'spotifyToken=';
+    spotifyToken = null;
+    location.reload();
+  }
+
+  userID = data.id;
+  displayName = data.display_name;
   ReactDOM.render( /*#__PURE__*/React.createElement(TopNav, {
-    name: data
+    name: data.display_name
   }), document.querySelector('#topNav'));
 };
 
@@ -124,8 +149,36 @@ var createRightNav = function createRightNav(data) {
   }), document.querySelector('#rightNav'));
 };
 
+var getCookie = function getCookie(cname) {
+  var name = cname + "=";
+  var ca = document.cookie.split(';');
+
+  for (var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+
+  return "";
+};
+
 var loadStation = function loadStation(stationNum) {
-  sendAjax('GET', '/getStation', stationNum, function (data) {});
+  if (stationNum < 0 || stationNum > 999) {
+    console.log('error!');
+    return;
+  }
+
+  console.log("loading station ".concat(stationNum));
+  document.querySelector("#stationNum").innerHTML = stationNum;
+  currentStation = stationNum; // sendAjax('GET', '/getStation', stationNum, (data) => {
+  //   console.log(data);
+  // });
 };
 
 $(document).ready(function () {
@@ -133,6 +186,40 @@ $(document).ready(function () {
 }); // This is where users login, links to account features. Sign in, sign out, create account
 
 var TopNav = function TopNav(props) {
+  var upStation = function upStation(e) {
+    loadStation(parseInt(document.querySelector("#stationNum").innerHTML) + 1);
+  };
+
+  var downStation = function downStation(e) {
+    loadStation(parseInt(document.querySelector("#stationNum").innerHTML) - 1);
+  };
+
+  var allowStationChange = function allowStationChange(e) {
+    var stationNumLabel = document.querySelector("#stationNum");
+    stationNumLabel.innerHTML = "___";
+    stationNumLabel.style.backgroundColor = "yellow";
+    var count = 0;
+    changeStation = true;
+
+    var checkInput = function checkInput(e) {
+      if (isFinite(e.key) && changeStation) {
+        if (count == 0) stationNumLabel.innerHTML = "";
+        stationNumLabel.innerHTML += e.key;
+        count++;
+
+        if (count == 3) {
+          changeStation = false;
+          loadStation(stationNumLabel.innerHTML);
+          stationNumLabel.style.backgroundColor = "white";
+          document.removeEventListener('keyup', checkInput);
+          return;
+        }
+      }
+    };
+
+    document.addEventListener('keyup', checkInput);
+  };
+
   return (/*#__PURE__*/React.createElement("div", {
       id: "stations"
     }, /*#__PURE__*/React.createElement("a", {
@@ -142,13 +229,16 @@ var TopNav = function TopNav(props) {
     }, "am_radio"), /*#__PURE__*/React.createElement("img", {
       className: "topNavLink",
       id: "prevStation",
+      onClick: downStation,
       src: "https://img.icons8.com/material-two-tone/48/000000/double-left.png"
     }), /*#__PURE__*/React.createElement("div", {
       className: "topNavLink",
-      id: "stationNum"
+      id: "stationNum",
+      onClick: allowStationChange
     }, currentStation), /*#__PURE__*/React.createElement("img", {
       className: "topNavLink",
       id: "nextStation",
+      onClick: upStation,
       src: "https://img.icons8.com/material-two-tone/48/000000/double-right.png"
     }), /*#__PURE__*/React.createElement("p", {
       className: "topNavLink",
@@ -177,10 +267,8 @@ var LeftNav = function LeftNav() {
 
 var RightNav = function RightNav(props) {
   var handleChange = function handleChange(event) {
-    console.log("value: " + event.value);
-    console.log("target: " + event.target.value);
     event.value = event.target.value;
-    event.target.name = 'playlistID';
+    event.target.name = 'spotifyURI';
   };
 
   var buildOptions = function buildOptions() {
@@ -197,6 +285,10 @@ var RightNav = function RightNav(props) {
       }, playlistNames[i]));
     }
 
+    optionsArray.unshift( /*#__PURE__*/React.createElement("option", {
+      key: undefined,
+      value: undefined
+    }, "..."));
     return optionsArray;
   };
 
@@ -217,14 +309,17 @@ var RightNav = function RightNav(props) {
     }), /*#__PURE__*/React.createElement("label", {
       id: "playlistLabel"
     }, "Playlist: "), /*#__PURE__*/React.createElement("select", {
-      id: "playlistID",
+      name: "spotifyURI",
+      id: "spotifyURI",
       onChange: handleChange
     }, buildOptions()), /*#__PURE__*/React.createElement("input", {
       type: "hidden",
-      name: "user",
-      value: userName
+      id: "userID",
+      name: "userID",
+      value: userID
     }), /*#__PURE__*/React.createElement("input", {
       type: "hidden",
+      id: "stationNum",
       name: "stationNum",
       value: currentStation
     }), /*#__PURE__*/React.createElement("input", {
@@ -252,7 +347,8 @@ var handleNewStation = function handleNewStation(e) {
   if ($("#stationName").val() == '') {
     console.log("missing name");
     return false;
-  }
+  } // console.log($("#newStationForm").serialize());
+
 
   sendAjax('POST', $("#newStationForm").attr("action"), $("#newStationForm").serialize(), redirect, function () {
     loadStation();

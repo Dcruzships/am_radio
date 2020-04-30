@@ -3,15 +3,15 @@ const models = require('../models');
 const { Station } = models;
 
 const createStation = (req, res) => {
-  if (!req.body.stationName || !req.body.playlistID) {
-    return res.status(400).json({ error: `Both station name and playlist are required. got ${req.body.stationName} and ${req.body.playlistID}` });
+  if (!req.body.stationName || !req.body.spotifyURI) {
+    return res.status(400).json({ error: `Both station name and playlist are required. got ${req.body.stationName} and ${req.body.spotifyURI}` });
   }
 
   const stationData = {
-    name: req.body.stationName,
-    num: req.body.stationNum,
-    creator: req.body.user,
-    spotifyURI: req.body.playlistID,
+    stationName: req.body.stationName,
+    stationNum: req.body.stationNum,
+    userID: req.body.userID,
+    spotifyURI: req.body.spotifyURI,
   };
 
   const newStation = new Station.StationModel(stationData);

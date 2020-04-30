@@ -1,12 +1,41 @@
 // This is where users login, links to account features. Sign in, sign out, create account
 const TopNav = (props) =>
 {
+  const upStation = (e) => { loadStation(parseInt(document.querySelector("#stationNum").innerHTML) + 1) };
+  const downStation = (e) => { loadStation(parseInt(document.querySelector("#stationNum").innerHTML) - 1) };
+
+  const allowStationChange = (e) =>
+  {
+    let stationNumLabel = document.querySelector("#stationNum");
+    stationNumLabel.innerHTML = "___";
+    stationNumLabel.style.backgroundColor = "yellow";
+    let count = 0;
+    changeStation = true;
+
+    const checkInput = (e) => {
+      if (isFinite(e.key) && changeStation) {
+        if (count == 0) stationNumLabel.innerHTML = "";
+        stationNumLabel.innerHTML += e.key;
+        count++;
+        if (count == 3) {
+          changeStation = false;
+          loadStation(stationNumLabel.innerHTML);
+          stationNumLabel.style.backgroundColor = "white";
+          document.removeEventListener('keyup', checkInput);
+          return;
+        }
+      }
+    };
+
+    document.addEventListener('keyup', checkInput);
+  }
+
   return(
     <div id="stations">
       <a className="topNavLink" href="/" id="logo">am_radio</a>
-      <img className="topNavLink" id="prevStation" src="https://img.icons8.com/material-two-tone/48/000000/double-left.png"></img>
-      <div className="topNavLink" id="stationNum">{currentStation}</div>
-      <img className="topNavLink" id="nextStation" src="https://img.icons8.com/material-two-tone/48/000000/double-right.png"></img>
+      <img className="topNavLink" id="prevStation" onClick={downStation} src="https://img.icons8.com/material-two-tone/48/000000/double-left.png"></img>
+      <div className="topNavLink" id="stationNum" onClick={allowStationChange}>{currentStation}</div>
+      <img className="topNavLink" id="nextStation" onClick={upStation} src="https://img.icons8.com/material-two-tone/48/000000/double-right.png"></img>
       <p className="topNavLink" id="name">Hello {props.name}</p>
     </div>
   );
@@ -30,10 +59,8 @@ const RightNav = (props) =>
 {
   const handleChange = (event) =>
   {
-    console.log("value: " + event.value);
-    console.log("target: " + event.target.value);
     event.value = event.target.value;
-    event.target.name = 'playlistID';
+    event.target.name = 'spotifyURI';
   }
 
   const buildOptions = () =>
@@ -47,8 +74,9 @@ const RightNav = (props) =>
       playlistNames.push(props.playlists[i].name);
       playlistIDs.push(props.playlists[i].uri);
       optionsArray.push(<option key={playlistNames[i]} value={playlistIDs[i]}>{playlistNames[i]}</option>);
-
     }
+    optionsArray.unshift(<option key={undefined} value={undefined}>...</option>);
+
     return optionsArray;
   }
 
@@ -65,11 +93,11 @@ const RightNav = (props) =>
           <label id="stationLabel">Station Name: </label>
           <input id="stationName" type="text" name="stationName" placeholder="My Radio 101"/>
           <label id="playlistLabel">Playlist: </label>
-            <select id="playlistID" onChange={handleChange}>
+            <select name="spotifyURI" id="spotifyURI" onChange={handleChange}>
               {buildOptions()}
             </select>
-          <input type="hidden" name="user" value={userName}/>
-          <input type="hidden" name="stationNum" value={currentStation}/>
+          <input type="hidden" id="userID" name="userID" value={userID}/>
+          <input type="hidden" id="stationNum" name="stationNum" value={currentStation}/>
           <input className="createStationSubmit" type="submit" value="Create Station"/>
         </form>
       </ul>
@@ -95,6 +123,8 @@ const handleNewStation = (e) => {
       console.log("missing name");
       return false;
     }
+
+    // console.log($("#newStationForm").serialize());
 
     sendAjax('POST', $("#newStationForm").attr("action"), $("#newStationForm").serialize(), redirect, function() {
       loadStation();
