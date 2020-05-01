@@ -1,10 +1,12 @@
 let currentStation = 0;
+let currentStationObject;
 let currentVis = 0;
 let spotifyToken;
 let userPlaylists;
 let userID = "";
 let displayName = "";
 let changeStation = false;
+let spotifyPlayer;
 
 const init = () =>
 {
@@ -18,9 +20,13 @@ const init = () =>
 
   currentStation = Math.floor(Math.random() * 990);
   currentStation = ('000' + currentStation).substr(-3);
+  currentStation = '749';
 
   if(!spotifyToken)
   {
+    document.cookie = 'spotifyToken=';
+    spotifyToken = null;
+
     ReactDOM.render(
         <button id="#loginButton" onClick={(e) =>
           {
@@ -37,15 +43,15 @@ const init = () =>
     document.cookie = `spotifyToken=${spotifyToken}`;
 
     makeNav();
-    setControls();
-    // loadStation();
+    loadStation(currentStation);
+    // createWindow();
   }
 };
 
 const makeNav = () =>
 {
   fetch('https://api.spotify.com/v1/me', {
-    headers: {'Authorization': 'Bearer ' + spotifyToken}
+    headers: {'Authorization': `Bearer ${spotifyToken}`}
   }).then(response => response.json())
   .then(data => createTopNav(data));
 
@@ -56,7 +62,7 @@ const makeNav = () =>
     let playlists = playlistData.items;
     let trackDataPromises = playlists.map(playlist => {
       let responsePromise = fetch(playlist.tracks.href, {
-        headers: {'Authorization': 'Bearer ' + spotifyToken}
+        headers: {'Authorization': `Bearer ${spotifyToken}`}
       })
       let trackDataPromise = responsePromise
         .then(response => response.json())
@@ -78,12 +84,47 @@ const makeNav = () =>
     return playlistsPromise;
   });
 
+  // const token = getOAuthTokenForPlayer(spotifyToken);
+  // const player = new Spotify.Player({
+  //   name: 'Web Playback SDK Quick Start Player',
+  //   getOAuthToken: cb => { cb(token); }
+  // });
+
+  // Error handling
+  // player.addListener('initialization_error', ({ message }) => { console.error(message); });
+  // player.addListener('authentication_error', ({ message }) => { console.error(message); });
+  // player.addListener('account_error', ({ message }) => { console.error(message); });
+  // player.addListener('playback_error', ({ message }) => { console.error(message); });
+  //
+  // // Playback status updates
+  // player.addListener('player_state_changed', state => { console.log(state); });
+  //
+  // // Ready
+  // player.addListener('ready', ({ device_id }) => {
+  //   console.log('Ready with Device ID', device_id);
+  // });
+  //
+  // // Not Ready
+  // player.addListener('not_ready', ({ device_id }) => {
+  //   console.log('Device ID has gone offline', device_id);
+  // });
+  //
+  // // Connect to the player!
+  // player.connect();
+
+  // createBotNav();
   ReactDOM.render(<LeftNav />, document.querySelector('#leftNav'));
-  ReactDOM.render(<BotNav />, document.querySelector('#botNav'));
 };
 
-const setControls = () => {
-  let stationNumLabel = document.querySelector("#stationNum");
+const getOAuthTokenForPlayer = (access_token) => {
+  return fetch(`https://api.spotify.com/v1/me/player`, {
+    body: JSON.stringify({ device_ids: 'am_radio', play: true }),
+    headers: {
+      Authorization: `Bearer ${access_token}`,
+      'Content-Type': 'application/json',
+    },
+    method: 'PUT',
+  });
 };
 
 const createTopNav = (data) =>
@@ -103,6 +144,17 @@ const createRightNav = (data) =>
 {
   userPlaylists = data;
   ReactDOM.render(<RightNav playlists={data} />, document.querySelector('#rightNav'));
+};
+
+const createBotNav = () =>
+{
+  // spotifyPlayer.connect().then(success => {
+  //   if (success) {
+  //     console.log('The Web Playback SDK successfully connected to Spotify!');
+  //   }
+  // })
+
+  ReactDOM.render(<BotNav />, document.querySelector('#botNav'));
 };
 
 const getCookie = (cname) => {
@@ -128,13 +180,35 @@ const loadStation = (stationNum) =>
     return;
   }
   console.log(`loading station ${stationNum}`);
-  document.querySelector("#stationNum").innerHTML = stationNum;
   currentStation = stationNum;
-  // sendAjax('GET', '/getStation', stationNum, (data) => {
-  //   console.log(data);
-  // });
+
+  let theStation =
+  {
+    stationNum: stationNum,
+  };
+
+  sendAjax('POST', '/getStation', theStation, (data) =>
+  {
+    currentStationObject = data.station;
+    let url = uriToUrl(currentStationObject.spotifyURI);
+    document.querySelector("#window").innerHTML = `<iframe src=${url} width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`;
+  });
 };
 
-$(document).ready(function() {
-  init();
+const createWindow = (data) => {
+  console.log(data);
+};
+
+const uriToUrl = (uri) => {
+  let finalURL = 'https://open.spotify.com/embed/';
+  let split = uri.split(':');
+  finalURL += `${split[1]}/${split[2]}`;
+  return finalURL;
+};
+
+$(document).ready(function()
+{
+  window.onSpotifyWebPlaybackSDKReady = () => {
+    init();
+  };
 });

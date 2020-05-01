@@ -1,14 +1,15 @@
-// CHANGE FOR FINAL REDIRECT
-// process.env.REDIRECT_URI
-
 const querystring = require('query-string');
 const request = require('request');
 
 const scopes = [
-  'user-read-currently-playing',
+  'streaming',
+  'user-read-birthdate',
   'user-read-playback-state',
+  'user-modify-playback-state',
   'user-read-private',
   'user-read-email',
+  'user-library-read',
+  'user-library-modify',
 ];
 
 const login = (req, res) => {

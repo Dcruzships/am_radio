@@ -69,6 +69,7 @@
     "node-spotify-api": "^1.1.1",
     "path": "^0.12.7",
     "query-string": "^6.12.1",
+    "react-spotify-web-playback": "^0.6.0",
     "redis": "^3.0.2",
     "request": "^2.88.2",
     "serve-favicon": "^2.5.0",

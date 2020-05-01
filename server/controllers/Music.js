@@ -32,10 +32,22 @@ const createStation = (req, res) => {
   return stationPromise;
 };
 
+const getStation = (req, res) => Station.StationModel.findStation(
+  req.body.stationNum, (err, docs) => {
+    if (err) {
+      return res.status(400).json({ error: 'An error occurred' });
+    }
+
+    // console.log(req.body);
+
+    return res.json({ station: docs });
+  },
+);
+
 const getAll = (req, res) => Station.StationModel.findByOwner(
   req.session.account._id, (err, docs) => {
     if (err) {
-      // console.log(err);
+      console.log(err);
       return res.status(400).json({ error: 'An error occurred' });
     }
 
@@ -44,4 +56,5 @@ const getAll = (req, res) => Station.StationModel.findByOwner(
 );
 
 module.exports.getAll = getAll;
+module.exports.getStation = getStation;
 module.exports.createStation = createStation;

@@ -55,6 +55,16 @@ StationSchema.statics.findByCreator = (userID, callback) => {
   return StationModel.find(search).select('name spotifyURI').lean().exec(callback);
 };
 
+StationSchema.statics.findStation = (num, callback) => {
+  const search = {
+    stationNum: num,
+  };
+
+  // console.log(num);
+  // console.log(search);
+  return StationModel.findOne(search, callback);
+};
+
 StationModel = mongoose.model('Station', StationSchema);
 
 module.exports.StationModel = StationModel;

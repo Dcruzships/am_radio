@@ -105,7 +105,7 @@ const RightNav = (props) =>
   );
 };
 
-const BotNav = () =>
+const BotNav = (props) =>
 {
   return (
     <div id="audioControls">
