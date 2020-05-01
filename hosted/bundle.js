@@ -1,13 +1,5 @@
 "use strict";
 
-var _this = void 0;
-
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 var handleError = function handleError(message) {
   $("#errorMessage").text(message);
   $("#errorMessage").animate({
@@ -34,6 +26,7 @@ var sendAjax = function sendAjax(type, action, data, success) {
     }
   });
 };
+"use strict";
 
 var currentStation = 0;
 var currentStationObject;
@@ -44,6 +37,7 @@ var userID = "";
 var displayName = "";
 var changeStation = false;
 var spotifyPlayer;
+var appWindow;
 
 var init = function init() {
   var queryString = window.location.search;
@@ -73,6 +67,7 @@ var init = function init() {
   } else {
     document.querySelector("#window").innerHTML = "<h3><span id='errorMessage'></span></h3>";
     document.cookie = "spotifyToken=".concat(spotifyToken);
+    appWindow = document.querySelector("#window");
     makeNav();
     loadStation(currentStation); // createWindow();
   }
@@ -230,9 +225,14 @@ var loadStation = function loadStation(stationNum) {
     stationNum: stationNum
   };
   sendAjax('POST', '/getStation', theStation, function (data) {
-    currentStationObject = data.station;
-    var url = uriToUrl(currentStationObject.spotifyURI);
-    document.querySelector("#window").innerHTML = "<iframe src=".concat(url, " width=\"300\" height=\"380\" frameborder=\"0\" allowtransparency=\"true\" allow=\"encrypted-media\"></iframe>");
+    if (data != null) {
+      appWindow.innerHTML = '';
+      currentStationObject = data.station;
+      var url = uriToUrl(currentStationObject.spotifyURI);
+      appWindow.innerHTML = "<iframe src=".concat(url, " width=\"500\" height=\"500\" frameborder=\"0\" allowtransparency=\"true\" allow=\"encrypted-media\"></iframe>");
+    } else {
+      appWindow.innerHTML = '';
+    }
   });
 };
 
@@ -251,8 +251,10 @@ $(document).ready(function () {
   window.onSpotifyWebPlaybackSDKReady = function () {
     init();
   };
-}); // This is where users login, links to account features. Sign in, sign out, create account
+});
+"use strict";
 
+// This is where users login, links to account features. Sign in, sign out, create account
 var TopNav = function TopNav(props) {
   var upStation = function upStation(e) {
     loadStation(parseInt(document.querySelector("#stationNum").innerHTML) + 1);
@@ -423,6 +425,7 @@ var handleNewStation = function handleNewStation(e) {
   });
   return false;
 };
+"use strict";
 
 var StationList = function StationList(props) {
   if (props.stations.length === 0) {
@@ -462,6 +465,15 @@ var getAllStations = function getAllStations() {
     }), document.querySelector("#window"));
   });
 };
+"use strict";
+
+var _this = void 0;
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var PlaylistCounter = function PlaylistCounter() {
   return (/*#__PURE__*/React.createElement("div", {
