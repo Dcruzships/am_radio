@@ -1,4 +1,5 @@
 let currentStation = 0;
+let lastStation = 0;
 let currentStationObject;
 let currentVis = 0;
 let spotifyToken;
@@ -22,6 +23,8 @@ const init = () =>
   currentStation = Math.floor(Math.random() * 990);
   currentStation = ('000' + currentStation).substr(-3);
   currentStation = '749';
+  lastStation = getCookie("lastStation");
+  if(lastStation != 0) { currentStation = lastStation; }
 
   if(!spotifyToken)
   {
@@ -86,47 +89,8 @@ const makeNav = () =>
     return playlistsPromise;
   });
 
-  // const token = getOAuthTokenForPlayer(spotifyToken);
-  // const player = new Spotify.Player({
-  //   name: 'Web Playback SDK Quick Start Player',
-  //   getOAuthToken: cb => { cb(token); }
-  // });
-
-  // Error handling
-  // player.addListener('initialization_error', ({ message }) => { console.error(message); });
-  // player.addListener('authentication_error', ({ message }) => { console.error(message); });
-  // player.addListener('account_error', ({ message }) => { console.error(message); });
-  // player.addListener('playback_error', ({ message }) => { console.error(message); });
-  //
-  // // Playback status updates
-  // player.addListener('player_state_changed', state => { console.log(state); });
-  //
-  // // Ready
-  // player.addListener('ready', ({ device_id }) => {
-  //   console.log('Ready with Device ID', device_id);
-  // });
-  //
-  // // Not Ready
-  // player.addListener('not_ready', ({ device_id }) => {
-  //   console.log('Device ID has gone offline', device_id);
-  // });
-  //
-  // // Connect to the player!
-  // player.connect();
-
   // createBotNav();
   ReactDOM.render(<LeftNav />, document.querySelector('#leftNav'));
-};
-
-const getOAuthTokenForPlayer = (access_token) => {
-  return fetch(`https://api.spotify.com/v1/me/player`, {
-    body: JSON.stringify({ device_ids: 'am_radio', play: true }),
-    headers: {
-      Authorization: `Bearer ${access_token}`,
-      'Content-Type': 'application/json',
-    },
-    method: 'PUT',
-  });
 };
 
 const createTopNav = (data) =>
@@ -150,11 +114,6 @@ const createRightNav = (data) =>
 
 const createBotNav = () =>
 {
-  // spotifyPlayer.connect().then(success => {
-  //   if (success) {
-  //     console.log('The Web Playback SDK successfully connected to Spotify!');
-  //   }
-  // })
 
   ReactDOM.render(<BotNav />, document.querySelector('#botNav'));
 };
@@ -183,6 +142,7 @@ const loadStation = (stationNum) =>
   }
   console.log(`loading station ${stationNum}`);
   currentStation = stationNum;
+  lastStation = currentStation;
 
   let theStation =
   {

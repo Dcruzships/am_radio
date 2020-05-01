@@ -67,6 +67,7 @@ const RightNav = (props) =>
   {
     event.value = event.target.value;
     event.target.name = 'spotifyURI';
+    document.querySelector("#formStationNum").value = currentStation;
   }
 
   const buildOptions = () =>
@@ -102,8 +103,8 @@ const RightNav = (props) =>
             <select name="spotifyURI" id="spotifyURI" onChange={handleChange}>
               {buildOptions()}
             </select>
-          <input type="hidden" id="userID" name="userID" value={userID}/>
-          <input type="hidden" id="stationNum" name="stationNum" value={currentStation}/>
+          <input type="hidden" id="formUserID" name="userID" value={userID}/>
+          <input type="hidden" id="formStationNum" name="stationNum" value={currentStation}/>
           <input className="createStationSubmit" type="submit" value="Create Station"/>
         </form>
       </ul>
@@ -123,14 +124,13 @@ const BotNav = (props) =>
 
 const handleNewStation = (e) => {
     e.preventDefault();
+    document.cookie = `lastStation=${lastStation}`;
 
     if ($("#stationName").val() == '')
     {
       console.log("missing name");
       return false;
     }
-
-    // console.log($("#newStationForm").serialize());
 
     sendAjax('POST', $("#newStationForm").attr("action"), $("#newStationForm").serialize(), redirect, function() {
       loadStation();

@@ -29,6 +29,7 @@ var sendAjax = function sendAjax(type, action, data, success) {
 "use strict";
 
 var currentStation = 0;
+var lastStation = 0;
 var currentStationObject;
 var currentVis = 0;
 var spotifyToken;
@@ -51,6 +52,11 @@ var init = function init() {
   currentStation = Math.floor(Math.random() * 990);
   currentStation = ('000' + currentStation).substr(-3);
   currentStation = '749';
+  lastStation = getCookie("lastStation");
+
+  if (lastStation != 0) {
+    currentStation = lastStation;
+  }
 
   if (!spotifyToken) {
     document.cookie = 'spotifyToken=';
@@ -119,49 +125,9 @@ var makeNav = function makeNav() {
       return createRightNav(data);
     });
     return playlistsPromise;
-  }); // const token = getOAuthTokenForPlayer(spotifyToken);
-  // const player = new Spotify.Player({
-  //   name: 'Web Playback SDK Quick Start Player',
-  //   getOAuthToken: cb => { cb(token); }
-  // });
-  // Error handling
-  // player.addListener('initialization_error', ({ message }) => { console.error(message); });
-  // player.addListener('authentication_error', ({ message }) => { console.error(message); });
-  // player.addListener('account_error', ({ message }) => { console.error(message); });
-  // player.addListener('playback_error', ({ message }) => { console.error(message); });
-  //
-  // // Playback status updates
-  // player.addListener('player_state_changed', state => { console.log(state); });
-  //
-  // // Ready
-  // player.addListener('ready', ({ device_id }) => {
-  //   console.log('Ready with Device ID', device_id);
-  // });
-  //
-  // // Not Ready
-  // player.addListener('not_ready', ({ device_id }) => {
-  //   console.log('Device ID has gone offline', device_id);
-  // });
-  //
-  // // Connect to the player!
-  // player.connect();
-  // createBotNav();
+  }); // createBotNav();
 
   ReactDOM.render( /*#__PURE__*/React.createElement(LeftNav, null), document.querySelector('#leftNav'));
-};
-
-var getOAuthTokenForPlayer = function getOAuthTokenForPlayer(access_token) {
-  return fetch("https://api.spotify.com/v1/me/player", {
-    body: JSON.stringify({
-      device_ids: 'am_radio',
-      play: true
-    }),
-    headers: {
-      Authorization: "Bearer ".concat(access_token),
-      'Content-Type': 'application/json'
-    },
-    method: 'PUT'
-  });
 };
 
 var createTopNav = function createTopNav(data) {
@@ -186,11 +152,6 @@ var createRightNav = function createRightNav(data) {
 };
 
 var createBotNav = function createBotNav() {
-  // spotifyPlayer.connect().then(success => {
-  //   if (success) {
-  //     console.log('The Web Playback SDK successfully connected to Spotify!');
-  //   }
-  // })
   ReactDOM.render( /*#__PURE__*/React.createElement(BotNav, null), document.querySelector('#botNav'));
 };
 
@@ -221,6 +182,7 @@ var loadStation = function loadStation(stationNum) {
 
   console.log("loading station ".concat(stationNum));
   currentStation = stationNum;
+  lastStation = currentStation;
   var theStation = {
     stationNum: stationNum
   };
@@ -341,6 +303,7 @@ var RightNav = function RightNav(props) {
   var handleChange = function handleChange(event) {
     event.value = event.target.value;
     event.target.name = 'spotifyURI';
+    document.querySelector("#formStationNum").value = currentStation;
   };
 
   var buildOptions = function buildOptions() {
@@ -386,12 +349,12 @@ var RightNav = function RightNav(props) {
       onChange: handleChange
     }, buildOptions()), /*#__PURE__*/React.createElement("input", {
       type: "hidden",
-      id: "userID",
+      id: "formUserID",
       name: "userID",
       value: userID
     }), /*#__PURE__*/React.createElement("input", {
       type: "hidden",
-      id: "stationNum",
+      id: "formStationNum",
       name: "stationNum",
       value: currentStation
     }), /*#__PURE__*/React.createElement("input", {
@@ -415,12 +378,12 @@ var BotNav = function BotNav(props) {
 
 var handleNewStation = function handleNewStation(e) {
   e.preventDefault();
+  document.cookie = "lastStation=".concat(lastStation);
 
   if ($("#stationName").val() == '') {
     console.log("missing name");
     return false;
-  } // console.log($("#newStationForm").serialize());
-
+  }
 
   sendAjax('POST', $("#newStationForm").attr("action"), $("#newStationForm").serialize(), redirect, function () {
     loadStation();
