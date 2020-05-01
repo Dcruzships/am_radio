@@ -191,7 +191,7 @@ const loadStation = (stationNum) =>
 
   sendAjax('POST', '/getStation', theStation, (data) =>
   {
-    if(data != null)
+    if(data.station != null)
     {
       appWindow.innerHTML = '';
       currentStationObject = data.station;
