@@ -225,7 +225,7 @@ var loadStation = function loadStation(stationNum) {
     stationNum: stationNum
   };
   sendAjax('POST', '/getStation', theStation, function (data) {
-    if (data != null) {
+    if (data.station != null) {
       appWindow.innerHTML = '';
       currentStationObject = data.station;
       var url = uriToUrl(currentStationObject.spotifyURI);
