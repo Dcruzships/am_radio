@@ -39,6 +39,7 @@ var displayName = "";
 var changeStation = false;
 var spotifyPlayer;
 var appWindow;
+var loaded = false;
 
 var init = function init() {
   var queryString = window.location.search;
@@ -149,6 +150,7 @@ var createRightNav = function createRightNav(data) {
   ReactDOM.render( /*#__PURE__*/React.createElement(RightNav, {
     playlists: data
   }), document.querySelector('#rightNav'));
+  loaded = true;
 };
 
 var createBotNav = function createBotNav() {
@@ -188,11 +190,13 @@ var loadStation = function loadStation(stationNum) {
   };
   sendAjax('POST', '/getStation', theStation, function (data) {
     if (data.station != null) {
+      if (loaded) document.querySelector("#newStationForm").style.visibility = 'hidden';
       appWindow.innerHTML = '';
       currentStationObject = data.station;
       var url = uriToUrl(currentStationObject.spotifyURI);
       appWindow.innerHTML = "<iframe src=".concat(url, " width=\"500\" height=\"500\" frameborder=\"0\" allowtransparency=\"true\" allow=\"encrypted-media\"></iframe>");
     } else {
+      document.querySelector("#newStationForm").style.visibility = 'visible';
       appWindow.innerHTML = "<p id='empty'>EMPTY STATION</p>";
     }
   });

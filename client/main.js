@@ -9,6 +9,7 @@ let displayName = "";
 let changeStation = false;
 let spotifyPlayer;
 let appWindow;
+let loaded = false;
 
 const init = () =>
 {
@@ -110,6 +111,7 @@ const createRightNav = (data) =>
 {
   userPlaylists = data;
   ReactDOM.render(<RightNav playlists={data} />, document.querySelector('#rightNav'));
+  loaded = true;
 };
 
 const createBotNav = () =>
@@ -153,6 +155,7 @@ const loadStation = (stationNum) =>
   {
     if(data.station != null)
     {
+      if(loaded)document.querySelector("#newStationForm").style.visibility = 'hidden';
       appWindow.innerHTML = '';
       currentStationObject = data.station;
       let url = uriToUrl(currentStationObject.spotifyURI);
@@ -160,9 +163,9 @@ const loadStation = (stationNum) =>
     }
     else
     {
+      document.querySelector("#newStationForm").style.visibility = 'visible';
       appWindow.innerHTML = `<p id='empty'>EMPTY STATION</p>`;
     }
-
   });
 };
 

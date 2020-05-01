@@ -40,7 +40,12 @@ body {
         text-decoration: underline; }
 
 .topNavLink {
-  display: inline-block; }
+  display: inline-block;
+}
+
+#newStationForm {
+  visibility: hidden;
+}
 
 #topNav {
   height: 125px;
