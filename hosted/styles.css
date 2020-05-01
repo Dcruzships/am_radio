@@ -15,6 +15,11 @@ body {
   overflow: hidden;
   background-color: black; }
 
+#empty {
+  position: absolute;
+  margin: 45%;
+  color: white; }
+
 .nav {
   position: absolute;
   margin: 0;

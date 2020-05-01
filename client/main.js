@@ -200,7 +200,7 @@ const loadStation = (stationNum) =>
     }
     else
     {
-      appWindow.innerHTML = '';
+      appWindow.innerHTML = `<p id='empty'>EMPTY STATION</p>`;
     }
 
   });

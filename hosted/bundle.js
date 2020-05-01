@@ -231,7 +231,7 @@ var loadStation = function loadStation(stationNum) {
       var url = uriToUrl(currentStationObject.spotifyURI);
       appWindow.innerHTML = "<iframe src=".concat(url, " width=\"500\" height=\"500\" frameborder=\"0\" allowtransparency=\"true\" allow=\"encrypted-media\"></iframe>");
     } else {
-      appWindow.innerHTML = '';
+      appWindow.innerHTML = "<p id='empty'>EMPTY STATION</p>";
     }
   });
 };
@@ -258,10 +258,12 @@ $(document).ready(function () {
 var TopNav = function TopNav(props) {
   var upStation = function upStation(e) {
     loadStation(parseInt(document.querySelector("#stationNum").innerHTML) + 1);
+    document.querySelector("#stationNum").innerHTML = currentStation;
   };
 
   var downStation = function downStation(e) {
     loadStation(parseInt(document.querySelector("#stationNum").innerHTML) - 1);
+    document.querySelector("#stationNum").innerHTML = currentStation;
   };
 
   var allowStationChange = function allowStationChange(e) {

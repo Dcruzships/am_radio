@@ -1,8 +1,14 @@
 // This is where users login, links to account features. Sign in, sign out, create account
 const TopNav = (props) =>
 {
-  const upStation = (e) => { loadStation(parseInt(document.querySelector("#stationNum").innerHTML) + 1) };
-  const downStation = (e) => { loadStation(parseInt(document.querySelector("#stationNum").innerHTML) - 1) };
+  const upStation = (e) => {
+    loadStation(parseInt(document.querySelector("#stationNum").innerHTML) + 1);
+    document.querySelector("#stationNum").innerHTML = currentStation;
+  };
+  const downStation = (e) => {
+    loadStation(parseInt(document.querySelector("#stationNum").innerHTML) - 1);
+    document.querySelector("#stationNum").innerHTML = currentStation;
+  };
 
   const allowStationChange = (e) =>
   {
