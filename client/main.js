@@ -7,6 +7,7 @@ let userID = "";
 let displayName = "";
 let changeStation = false;
 let spotifyPlayer;
+let appWindow;
 
 const init = () =>
 {
@@ -41,6 +42,7 @@ const init = () =>
   {
     document.querySelector("#window").innerHTML = "<h3><span id='errorMessage'></span></h3>";
     document.cookie = `spotifyToken=${spotifyToken}`;
+    appWindow = document.querySelector("#window");
 
     makeNav();
     loadStation(currentStation);
@@ -189,9 +191,18 @@ const loadStation = (stationNum) =>
 
   sendAjax('POST', '/getStation', theStation, (data) =>
   {
-    currentStationObject = data.station;
-    let url = uriToUrl(currentStationObject.spotifyURI);
-    document.querySelector("#window").innerHTML = `<iframe src=${url} width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`;
+    if(data != null)
+    {
+      appWindow.innerHTML = '';
+      currentStationObject = data.station;
+      let url = uriToUrl(currentStationObject.spotifyURI);
+      appWindow.innerHTML = `<iframe src=${url} width="500" height="500" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`;
+    }
+    else
+    {
+      appWindow.innerHTML = '';
+    }
+
   });
 };
 
