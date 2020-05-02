@@ -1,6 +1,80 @@
 // This is where users login, links to account features. Sign in, sign out, create account
 const TopNav = (props) =>
 {
+  return(
+    <div id="topNav">
+      <a className="topNavLink" href="/" id="logo">am_radio</a>
+      <p className="topNavLink" id="name">Hello {props.name}</p>
+    </div>
+  );
+};
+
+const LeftNav = () =>
+{
+  return (
+    <div id="leftNav">
+    </div>
+  );
+  //
+  // <ul>
+  //   <li><a href="/all" className="leftNavLink">All</a></li>
+  //   <li><a href="/mine" className="leftNavLink">Mine</a></li>
+  //   <li><a href="/station" className="leftNavLink">Station</a></li>
+  // </ul>
+  // <div id="album"></div>
+};
+
+const RightNav = (props) =>
+{
+  const handleChange = (event) =>
+  {
+    event.value = event.target.value;
+    event.target.name = 'spotifyURI';
+    document.querySelector("#formStationNum").value = currentStation;
+  }
+
+  const buildOptions = () =>
+  {
+    let playlistNames = [];
+    let playlistIDs = [];
+    let optionsArray = [];
+
+    for(let i = 0; i < props.playlists.length; i++)
+    {
+      playlistNames.push(props.playlists[i].name);
+      playlistIDs.push(props.playlists[i].uri);
+      optionsArray.push(<option key={playlistNames[i]} value={playlistIDs[i]}>{playlistNames[i]}</option>);
+    }
+    optionsArray.unshift(<option key={undefined} value={undefined}>...</option>);
+
+    return optionsArray;
+  }
+
+  return (
+    <div>
+      <form id="newStationForm"
+            name="newStationForm"
+            onSubmit={handleNewStation}
+            action="/create"
+            method="POST"
+            className="stationForm rightNavLink"
+      >
+        <label className='rightNavLink' id="stationLabel">Station Name: </label>
+        <input className='rightNavLink' id="stationName" type="text" name="stationName" placeholder="My Radio 101"/>
+        <label className='rightNavLink' id="playlistLabel">Playlist: </label>
+          <select className='rightNavLink' name="spotifyURI" id="spotifyURI" onChange={handleChange}>
+            {buildOptions()}
+          </select>
+        <input type="hidden" id="formUserID" name="userID" value={userID}/>
+        <input type="hidden" id="formStationNum" name="stationNum" value={currentStation}/>
+        <input className="createStationSubmit rightNavLink" type="submit" value="Create Station"/>
+      </form>
+    </div>
+  );
+};
+
+const BotNav = () =>
+{
   const upStation = (e) => {
     loadStation(parseInt(document.querySelector("#stationNum").innerHTML) + 1);
     document.querySelector("#stationNum").innerHTML = currentStation;
@@ -34,90 +108,13 @@ const TopNav = (props) =>
     };
 
     document.addEventListener('keyup', checkInput);
-  }
-
-  return(
-    <div id="stations">
-      <a className="topNavLink" href="/" id="logo">am_radio</a>
-      <img className="topNavLink" id="prevStation" onClick={downStation} src="https://img.icons8.com/material-two-tone/48/000000/double-left.png"></img>
-      <div className="topNavLink" id="stationNum" onClick={allowStationChange}>{currentStation}</div>
-      <img className="topNavLink" id="nextStation" onClick={upStation} src="https://img.icons8.com/material-two-tone/48/000000/double-right.png"></img>
-      <p className="topNavLink" id="name">Hello {props.name}</p>
-    </div>
-  );
-};
-
-const LeftNav = () =>
-{
-  return (
-    <div id="stations">
-      <ul>
-        <li><a href="/all" class="leftNavButts">All</a></li>
-        <li><a href="/mine" class="leftNavButts">Mine</a></li>
-        <li><a href="/station" class="leftNavButts">Station</a></li>
-      </ul>
-      <div id="album"></div>
-    </div>
-  );
-};
-
-const RightNav = (props) =>
-{
-  const handleChange = (event) =>
-  {
-    event.value = event.target.value;
-    event.target.name = 'spotifyURI';
-    document.querySelector("#formStationNum").value = currentStation;
-  }
-
-  const buildOptions = () =>
-  {
-    let playlistNames = [];
-    let playlistIDs = [];
-    let optionsArray = [];
-
-    for(let i = 0; i < props.playlists.length; i++)
-    {
-      playlistNames.push(props.playlists[i].name);
-      playlistIDs.push(props.playlists[i].uri);
-      optionsArray.push(<option key={playlistNames[i]} value={playlistIDs[i]}>{playlistNames[i]}</option>);
-    }
-    optionsArray.unshift(<option key={undefined} value={undefined}>...</option>);
-
-    return optionsArray;
-  }
+  };
 
   return (
-    <div>
-      <ul>
-        <form id="newStationForm"
-              name="newStationForm"
-              onSubmit={handleNewStation}
-              action="/create"
-              method="POST"
-              className="stationForm"
-        >
-          <label id="stationLabel">Station Name: </label>
-          <input id="stationName" type="text" name="stationName" placeholder="My Radio 101"/>
-          <label id="playlistLabel">Playlist: </label>
-            <select name="spotifyURI" id="spotifyURI" onChange={handleChange}>
-              {buildOptions()}
-            </select>
-          <input type="hidden" id="formUserID" name="userID" value={userID}/>
-          <input type="hidden" id="formStationNum" name="stationNum" value={currentStation}/>
-          <input className="createStationSubmit" type="submit" value="Create Station"/>
-        </form>
-      </ul>
-    </div>
-  );
-};
-
-const BotNav = (props) =>
-{
-  return (
-    <div id="audioControls">
-      <img src="https://img.icons8.com/wired/64/000000/play-button-circled.png"/>
-      <img src="https://img.icons8.com/cotton/64/000000/circled-pause.png"/>
+    <div className="botNavLink" id='stationControls'>
+      <img className="botNavLink" id="nextStation" onClick={upStation} src="https://img.icons8.com/material-two-tone/48/000000/double-right.png"></img>
+      <div className="botNavLink" id="stationNum" onClick={allowStationChange}>{currentStation}</div>
+      <img className="botNavLink" id="prevStation" onClick={downStation} src="https://img.icons8.com/material-two-tone/48/000000/double-left.png"></img>
     </div>
   );
 };
@@ -128,7 +125,7 @@ const handleNewStation = (e) => {
 
     if ($("#stationName").val() == '')
     {
-      console.log("missing name");
+      document.querySelector("#errorMessage").innerHTML = "Error: All fields are required."
       return false;
     }
 

@@ -56,9 +56,19 @@ const init = () =>
 
 const makeNav = () =>
 {
+  function handleErrors(response) {
+    if (!response.ok) {
+        throw Error(response.statusText);
+        document.cookie = 'spotifyToken=';
+        spotifyToken = null;
+        location.reload();
+    }
+    return response;
+  }
+
   fetch('https://api.spotify.com/v1/me', {
     headers: {'Authorization': `Bearer ${spotifyToken}`}
-  }).then(response => response.json())
+  }).then(handleErrors).then(response => response.json())
   .then(data => createTopNav(data));
 
   fetch('https://api.spotify.com/v1/me/playlists', {
@@ -90,18 +100,12 @@ const makeNav = () =>
     return playlistsPromise;
   });
 
-  // createBotNav();
+  createBotNav();
   ReactDOM.render(<LeftNav />, document.querySelector('#leftNav'));
 };
 
 const createTopNav = (data) =>
 {
-  if(data.error != undefined)
-  {
-    document.cookie = 'spotifyToken=';
-    spotifyToken = null;
-    location.reload();
-  }
   userID = data.id;
   displayName = data.display_name;
   ReactDOM.render(<TopNav name={data.display_name} />, document.querySelector('#topNav'));
@@ -116,23 +120,7 @@ const createRightNav = (data) =>
 
 const createBotNav = () =>
 {
-
   ReactDOM.render(<BotNav />, document.querySelector('#botNav'));
-};
-
-const getCookie = (cname) => {
-  var name = cname + "=";
-  var ca = document.cookie.split(';');
-  for(var i = 0; i < ca.length; i++) {
-    var c = ca[i];
-    while (c.charAt(0) == ' ') {
-      c = c.substring(1);
-    }
-    if (c.indexOf(name) == 0) {
-      return c.substring(name.length, c.length);
-    }
-  }
-  return "";
 };
 
 const loadStation = (stationNum) =>
@@ -159,12 +147,12 @@ const loadStation = (stationNum) =>
       appWindow.innerHTML = '';
       currentStationObject = data.station;
       let url = uriToUrl(currentStationObject.spotifyURI);
-      appWindow.innerHTML = `<iframe src=${url} width="500" height="500" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`;
+      appWindow.innerHTML = `<iframe src=${url} frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`;
     }
     else
     {
       document.querySelector("#newStationForm").style.visibility = 'visible';
-      appWindow.innerHTML = `<p id='empty'>EMPTY STATION</p>`;
+      appWindow.innerHTML = `<span><p id='errorMessage'>EMPTY STATION</p></span>`;
     }
   });
 };

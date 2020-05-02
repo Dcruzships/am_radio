@@ -1,131 +1,132 @@
 // Here we are defining two variables to store some style information
-$appWidth: 95vw;
+$appWidth: 98vw;
 $appHeight: 95vh;
+$windowWidth: 85vw;
+$windowHeight: 70vh;
 $bgColor: black;
 $navColor: white;
 $fontNav: 'Roboto Mono';
 
 :root {
+  background-color: black;
   font-size: 16px;
   font-family: $fontNav;
-  --text-primary: #b6b6b6;
-  --text-secondary: #ececec;
-  --bg-primary: #23232e;
-  --bg-secondary: #141418;
-  --transition-speed: 600ms;
-}
-
-// SASS also allows us to create functions that we can use to dynamically
-// calculate styles at build time.
-@function calcDivMargin($width) {
-  @return $width / 4;
-}
-
-// Since SASS builds to css, we can write css as normal.
-body {
-  height: $appHeight;
-  width: $appWidth;
-  margin: 1em;
-  padding: 0px;
+  --transition-speed: 3s;
   overflow: hidden;
-  background-color: $bgColor;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-#empty {
-  position: absolute;
-  margin: 45%;
-  color: white;
-}
-
-.nav {
-  position: absolute;
-  margin: 0;
-  font: '$fontNav';
-  font-size: 35px;
+#screen {
+  margin: 10px;
   background-color: $navColor;
-  ul {
-    li {
-      margin: 0;
-      padding: 0;
-      float: left;
-      a {
-        &:hover{
-          text-decoration: underline;
-        }
-        text-decoration: none;
-        padding: 10px 30px;
-        display: block;
-        color: black;
-        text-align: center;
-      }
-    }
-  }
-}
-
-.topNavLink {
-  display: inline-block;
-}
-
-#topNav {
-  height: 125px;
-  width: 97%;
-  top: 2%;
-  ul {
-    margin-left: 100px;
-    padding-left: 150px;
-    list-style-type: none;
-  }
-}
-
-#leftNav {
-  top: 4em;
-  height: 70%;
-  width: 150px;
-  ul {
-    margin: 0;
-    padding: 0;
-    list-style-type: square;
-    li {
-      a {
-        padding: 25px 25px;
-        display: block;
-        color: black;
-        text-align: center;
-      }
-    }
-  }
-}
-
-#rightNav {
-  top: 4em;
-  left: 90%;
-  height: 70%;
-  width: 150px;
-  ul {
-    margin: 0;
-    padding: 0;
-    list-style-type: square;
-    li {
-      a {
-        padding: 25px 25px;
-        display: block;
-        color: black;
-        text-align: center;
-      }
-    }
-  }
-}
-
-#botNav {
-  top: 85%;
-  height: 125px;
-  width: 96.1%;
+  color: $bgColor;
+  width: $appWidth;
+  height: $appHeight;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #window {
   position: absolute;
-  font-size: 30px;
-  color: black;
-  left: 40%;
-  top: 30%;
+  width: $windowWidth;
+  height: $windowHeight;
+  background-color: $bgColor;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-style: solid;
+  border-color: red;
+  border-width: medium;
+
+  iframe {
+    width: $appWidth - 20vw;
+    height: $appHeight - 35vh;
+  }
+
+  span {
+    border-style: solid;
+    border-color: white;
+  }
+
+  #errorMessage {
+    color: $navColor;
+    font-size: 15px;
+  }
+}
+
+#Nav {
+  width: $appWidth;
+  height: $appHeight;
+  background-color: $navColor;
+  .nav {
+    color: $bgColor;
+    font-size: 30px;
+  }
+  .topNavLink .leftNavLink .rightNav .topNavLink {
+    display: flex;
+    flex-direction: row;
+  }
+  .rightNavLink {
+    font-size: 16px;
+  }
+}
+
+#topNav {
+  position: fixed;
+  width: $appWidth;
+  height: ($appHeight - $windowHeight) / 2.1;
+  display: flex;
+  flex-direction: row;
+  align-content: center;
+  justify-content: center;
+  #logo {
+    position: fixed;
+    left: 1.5em;
+    top: (($appHeight - $windowHeight) / 2.1) / 2;
+  }
+}
+#leftNav {
+  position: fixed;
+  top: ($appHeight - $windowHeight) / 1.7;
+  width: 6.2%;
+  height: $windowHeight;
+}
+#rightNav {
+  position: fixed;
+  top: ($appHeight - $windowHeight) / 1.7;
+  left: $appWidth - 5.5vw;
+  width: 6.2%;
+  height: $windowHeight;
+  visibility: hidden;
+}
+#botNav {
+  position: fixed;
+  top: $appHeight - 10vh;
+  width: $appWidth;
+  height: ($appHeight - $windowHeight) / 2.1;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+
+  #stationControls {
+    display: flex;
+    flex-direction: row-reverse;
+    margin-right: 25px;
+    #prevStation:hover {
+      cursor: pointer;
+      width: 55px;
+    }
+    #stationNum:hover {
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    #nextStation:hover {
+      cursor: pointer;
+      width: 55px;
+    }
+  }
 }
