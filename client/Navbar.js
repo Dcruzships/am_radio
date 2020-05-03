@@ -1,4 +1,4 @@
-// This is where users login, links to account features. Sign in, sign out, create account
+// This is where users logout and see their information
 const TopNav = (props) =>
 {
   const logout = (e) =>
@@ -26,8 +26,10 @@ const TopNav = (props) =>
   }
 };
 
+// A form to collect data about a potential station from a user's Spotify playlists
 const NewStationForm = (props) =>
 {
+  // To adjust form values
   const handleChange = (event) =>
   {
     event.value = event.target.value;
@@ -35,6 +37,7 @@ const NewStationForm = (props) =>
     document.querySelector("#formStationNum").value = currentStation;
   }
 
+  // For the options of the playlist selector
   const buildOptions = () =>
   {
     let playlistNames = [];
@@ -74,8 +77,10 @@ const NewStationForm = (props) =>
   );
 };
 
+// Displays a station adjuster and a radio-esque label
 const BotNav = (props) =>
 {
+  // Station controls
   const upStation = (e) => {
     loadStation(parseInt(document.querySelector("#stationNum").innerHTML) + 1);
     document.querySelector("#stationNum").innerHTML = currentStation;
@@ -85,6 +90,7 @@ const BotNav = (props) =>
     document.querySelector("#stationNum").innerHTML = currentStation;
   };
 
+  // For the interactable station changer, uses keyboard
   const allowStationChange = (e) =>
   {
     let stationNumLabel = document.querySelector("#stationNum");
@@ -126,6 +132,7 @@ const BotNav = (props) =>
   );
 };
 
+// Called when user submits form, sends data through AJAX to the server
 const handleNewStation = (e) => {
     e.preventDefault();
     document.cookie = `lastStation=${lastStation}`;

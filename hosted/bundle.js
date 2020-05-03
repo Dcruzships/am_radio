@@ -56,7 +56,9 @@ var imageID = "";
 var changeStation = false;
 var spotifyPlayer;
 var appWindow;
-var loaded = false;
+var loaded = false; // Begins app
+// Finds a Spotify token from URL sent back
+// Initializes default station values for optimal launch experience
 
 var init = function init() {
   var queryString = window.location.search;
@@ -65,16 +67,15 @@ var init = function init() {
 
   if (spotifyToken == null) {
     spotifyToken = getCookie("spotifyToken");
-  } // currentStation = Math.floor(Math.random() * 990);
-  // currentStation = ('000' + currentStation).substr(-3);
-
+  }
 
   currentStation = '749';
   lastStation = getCookie("lastStation");
 
   if (lastStation != 0) {
     currentStation = lastStation;
-  }
+  } // Checks if a token is found, if not display the login page
+
 
   if (!spotifyToken) {
     document.cookie = 'spotifyToken=';
@@ -95,7 +96,9 @@ var init = function init() {
     appWindow = document.querySelector("#window");
     makeNav();
   }
-};
+}; // Fetches data from the Spotify API and displays the main UI
+// Gets back Spotify username and playlists
+
 
 var makeNav = function makeNav() {
   function handleErrors(response) {
@@ -112,7 +115,8 @@ var makeNav = function makeNav() {
   function checkLoaded() {
     loaded = true;
     return loaded;
-  }
+  } // Get the username for the top nav
+
 
   fetch('https://api.spotify.com/v1/me', {
     headers: {
@@ -122,7 +126,9 @@ var makeNav = function makeNav() {
     return response.json();
   }).then(function (data) {
     return createTopNav(data);
-  });
+  }); // Get the playlists, then load the current station and print
+  // the rest of the UI
+
   fetch('https://api.spotify.com/v1/me/playlists', {
     headers: {
       'Authorization': 'Bearer ' + spotifyToken
@@ -162,7 +168,8 @@ var makeNav = function makeNav() {
     });
     return playlistsPromise;
   });
-};
+}; // Create the top nav bar
+
 
 var createTopNav = function createTopNav(data) {
   userID = data.id;
@@ -170,13 +177,15 @@ var createTopNav = function createTopNav(data) {
   ReactDOM.render( /*#__PURE__*/React.createElement(TopNav, {
     name: data.display_name
   }), document.querySelector('#topNav'));
-};
+}; // Render the bottom nav bar
+
 
 var createBotNav = function createBotNav(data) {
   ReactDOM.render( /*#__PURE__*/React.createElement(BotNav, {
     text: "Now listening to: " + currentStationName
   }), document.querySelector('#botNav'));
-};
+}; // Render the station maker form
+
 
 var createRightNav = function createRightNav(data) {
   userPlaylists = data;
@@ -184,7 +193,8 @@ var createRightNav = function createRightNav(data) {
     playlists: data
   }), document.querySelector('#rightNav'));
   loaded = true;
-};
+}; // Load a station, display a spotify widget with a saved playlist from the server
+
 
 var loadStation = function loadStation(stationNum) {
   if (stationNum < 0 || stationNum > 999) {
@@ -196,7 +206,8 @@ var loadStation = function loadStation(stationNum) {
   lastStation = currentStation;
   var theStation = {
     stationNum: stationNum
-  };
+  }; // Acts as a get request but also sends the station number to return specific data
+
   sendAjax('POST', '/getStation', theStation, function (data) {
     if (data.station != null) {
       if (loaded) document.querySelector("#newStationForm").style.visibility = 'hidden';
@@ -214,7 +225,8 @@ var loadStation = function loadStation(stationNum) {
     }
   });
   return currentStationObject;
-};
+}; // Returns a Spotify URL given a URI code
+
 
 var uriToUrl = function uriToUrl(start, uri) {
   var finalURL = start;
@@ -230,7 +242,7 @@ $(document).ready(function () {
 });
 "use strict";
 
-// This is where users login, links to account features. Sign in, sign out, create account
+// This is where users logout and see their information
 var TopNav = function TopNav(props) {
   var logout = function logout(e) {
     document.cookie = 'spotifyToken=';
@@ -270,14 +282,17 @@ var TopNav = function TopNav(props) {
       }, /*#__PURE__*/React.createElement("p", null, "logout")))
     );
   }
-};
+}; // A form to collect data about a potential station from a user's Spotify playlists
+
 
 var NewStationForm = function NewStationForm(props) {
+  // To adjust form values
   var handleChange = function handleChange(event) {
     event.value = event.target.value;
     event.target.name = 'spotifyURI';
     document.querySelector("#formStationNum").value = currentStation;
-  };
+  }; // For the options of the playlist selector
+
 
   var buildOptions = function buildOptions() {
     var playlistNames = [];
@@ -337,9 +352,11 @@ var NewStationForm = function NewStationForm(props) {
       value: "Create"
     })))
   );
-};
+}; // Displays a station adjuster and a radio-esque label
+
 
 var BotNav = function BotNav(props) {
+  // Station controls
   var upStation = function upStation(e) {
     loadStation(parseInt(document.querySelector("#stationNum").innerHTML) + 1);
     document.querySelector("#stationNum").innerHTML = currentStation;
@@ -348,7 +365,8 @@ var BotNav = function BotNav(props) {
   var downStation = function downStation(e) {
     loadStation(parseInt(document.querySelector("#stationNum").innerHTML) - 1);
     document.querySelector("#stationNum").innerHTML = currentStation;
-  };
+  }; // For the interactable station changer, uses keyboard
+
 
   var allowStationChange = function allowStationChange(e) {
     var stationNumLabel = document.querySelector("#stationNum");
@@ -402,7 +420,8 @@ var BotNav = function BotNav(props) {
       src: "https://img.icons8.com/material-two-tone/48/000000/double-left.png"
     })))
   );
-};
+}; // Called when user submits form, sends data through AJAX to the server
+
 
 var handleNewStation = function handleNewStation(e) {
   e.preventDefault();
@@ -417,111 +436,4 @@ var handleNewStation = function handleNewStation(e) {
     loadStation();
   });
   return false;
-};
-"use strict";
-
-var StationList = function StationList(props) {
-  if (props.stations.length === 0) {
-    return (/*#__PURE__*/React.createElement("div", {
-        className: "stationList"
-      }, /*#__PURE__*/React.createElement("h3", {
-        className: "emptyStations"
-      }, "No Stations yet"))
-    );
-  }
-
-  var allStations = props.stations.map(function (station) {
-    return (/*#__PURE__*/React.createElement("div", {
-        key: station._id,
-        className: "station"
-      }, /*#__PURE__*/React.createElement("img", {
-        src: station[0].albumArt,
-        alt: "/assets/img/radio.png",
-        className: "cover"
-      }), /*#__PURE__*/React.createElement("h3", {
-        className: "stationName"
-      }, " Name: ", station.name, " "), /*#__PURE__*/React.createElement("h3", {
-        className: "stationCreator"
-      }, " Created by: ", station.creator, " "))
-    );
-  });
-  return (/*#__PURE__*/React.createElement("div", {
-      className: "stationList"
-    }, allStations)
-  );
-};
-
-var getAllStations = function getAllStations() {
-  sendAjax('GET', '/getAll', null, function (data) {
-    ReactDOM.render( /*#__PURE__*/React.createElement(StationList, {
-      stations: data.stations
-    }), document.querySelector("#window"));
-  });
-};
-"use strict";
-
-var _this = void 0;
-
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-var PlaylistCounter = function PlaylistCounter() {
-  return (/*#__PURE__*/React.createElement("div", {
-      style: {
-        width: "40%",
-        display: 'inline-block'
-      }
-    }, /*#__PURE__*/React.createElement("h2", null, _this.props.playlists.length, " playlists"))
-  );
-};
-
-var HoursCounter = function HoursCounter() {
-  var allSongs = _this.props.playlists.reduce(function (songs, eachPlaylist) {
-    return songs.concat(eachPlaylist.songs);
-  }, []);
-
-  var totalDuration = allSongs.reduce(function (sum, eachSong) {
-    return sum + eachSong.duration;
-  }, 0);
-  return (/*#__PURE__*/React.createElement("div", {
-      style: _objectSpread({}, defaultStyle, {
-        width: "40%",
-        display: 'inline-block'
-      })
-    }, /*#__PURE__*/React.createElement("h2", null, Math.round(totalDuration / 60), " hours"))
-  );
-};
-
-var Filter = function Filter() {
-  return (/*#__PURE__*/React.createElement("div", {
-      style: defaultStyle
-    }, /*#__PURE__*/React.createElement("img", null), /*#__PURE__*/React.createElement("input", {
-      type: "text",
-      onKeyUp: function onKeyUp(event) {
-        return _this.props.onTextChange(event.target.value);
-      }
-    }))
-  );
-};
-
-var Playlist = function Playlist() {
-  var playlist = _this.props.playlist;
-  return (/*#__PURE__*/React.createElement("div", {
-      style: _objectSpread({}, defaultStyle, {
-        display: 'inline-block',
-        width: "25%"
-      })
-    }, /*#__PURE__*/React.createElement("img", {
-      src: playlist.imageUrl,
-      style: {
-        width: '60px'
-      }
-    }), /*#__PURE__*/React.createElement("h3", null, playlist.name), /*#__PURE__*/React.createElement("ul", null, playlist.songs.map(function (song) {
-      return (/*#__PURE__*/React.createElement("li", null, song.name)
-      );
-    })))
-  );
 };

@@ -1,6 +1,7 @@
 const querystring = require('query-string');
 const request = require('request');
 
+// Spotify API scopes requested
 const scopes = [
   'streaming',
   'user-read-birthdate',
@@ -12,6 +13,7 @@ const scopes = [
   'user-library-modify',
 ];
 
+// Redirect to the Spotify Authorization client
 const login = (req, res) => {
   res.redirect(`https://accounts.spotify.com/authorize?${
     querystring.stringify({
@@ -22,6 +24,7 @@ const login = (req, res) => {
     })}`);
 };
 
+// Will be called if user gets a token from Spotify
 const callback = (req, res) => {
   const code = req.query.code || null;
   const authOptions = {

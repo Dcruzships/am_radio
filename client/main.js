@@ -13,6 +13,9 @@ let spotifyPlayer;
 let appWindow;
 let loaded = false;
 
+// Begins app
+// Finds a Spotify token from URL sent back
+// Initializes default station values for optimal launch experience
 const init = () =>
 {
   const queryString = window.location.search;
@@ -23,12 +26,11 @@ const init = () =>
     spotifyToken = getCookie("spotifyToken");
   }
 
-  // currentStation = Math.floor(Math.random() * 990);
-  // currentStation = ('000' + currentStation).substr(-3);
   currentStation = '749';
   lastStation = getCookie("lastStation");
   if(lastStation != 0) { currentStation = lastStation; }
 
+  // Checks if a token is found, if not display the login page
   if(!spotifyToken)
   {
     document.cookie = 'spotifyToken=';
@@ -56,6 +58,8 @@ const init = () =>
   }
 };
 
+// Fetches data from the Spotify API and displays the main UI
+// Gets back Spotify username and playlists
 const makeNav = () =>
 {
   function handleErrors(response) {
@@ -73,11 +77,14 @@ const makeNav = () =>
     return loaded;
   }
 
+  // Get the username for the top nav
   fetch('https://api.spotify.com/v1/me', {
     headers: {'Authorization': `Bearer ${spotifyToken}`}
   }).then(handleErrors).then(response => response.json())
   .then(data => createTopNav(data));
 
+  // Get the playlists, then load the current station and print
+  // the rest of the UI
   fetch('https://api.spotify.com/v1/me/playlists', {
     headers: {'Authorization': 'Bearer ' + spotifyToken}
   }).then(handleErrors).then(response => response.json())
@@ -108,6 +115,7 @@ const makeNav = () =>
   });
 };
 
+// Create the top nav bar
 const createTopNav = (data) =>
 {
   userID = data.id;
@@ -116,11 +124,13 @@ const createTopNav = (data) =>
   ReactDOM.render(<TopNav name={data.display_name} />, document.querySelector('#topNav'));
 };
 
+// Render the bottom nav bar
 const createBotNav = (data) =>
 {
   ReactDOM.render(<BotNav text={"Now listening to: " + currentStationName} />, document.querySelector('#botNav'));
 };
 
+// Render the station maker form
 const createRightNav = (data) =>
 {
   userPlaylists = data;
@@ -128,6 +138,7 @@ const createRightNav = (data) =>
   loaded = true;
 };
 
+// Load a station, display a spotify widget with a saved playlist from the server
 const loadStation = (stationNum) =>
 {
   if(stationNum < 0 || stationNum > 999)
@@ -143,6 +154,7 @@ const loadStation = (stationNum) =>
     stationNum: stationNum,
   };
 
+  // Acts as a get request but also sends the station number to return specific data
   sendAjax('POST', '/getStation', theStation, (data) =>
   {
     if(data.station != null)
@@ -167,6 +179,7 @@ const loadStation = (stationNum) =>
   return currentStationObject;
 };
 
+// Returns a Spotify URL given a URI code
 const uriToUrl = (start, uri) => {
   let finalURL = start;
   let split = uri.split(':');

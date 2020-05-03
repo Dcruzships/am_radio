@@ -1,3 +1,4 @@
+// Renders homepage
 const homepage = (req, res) => {
   res.render('app');
 };

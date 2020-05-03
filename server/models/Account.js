@@ -4,10 +4,9 @@ const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
 let AccountModel = {};
-// const iterations = 10000;
-// const saltLength = 64;
-// const keyLength = 64;
 
+// Default account data
+// Does not get a password = the ULTIMATE password encryption
 const AccountSchema = new mongoose.Schema({
   spotifyID: {
     type: String,
@@ -30,12 +29,14 @@ const AccountSchema = new mongoose.Schema({
   },
 });
 
+// Readable accounts
 AccountSchema.statics.toAPI = (doc) => ({
   spotifyID: doc.id,
   auth: doc.auth,
   name: doc.name,
 });
 
+// Get an account from the userID
 AccountSchema.statics.findByUsername = (id, callback) => {
   const search = {
     spotifyID: id,

@@ -10,6 +10,7 @@ let StationModel = {};
 const convertId = mongoose.Types.ObjectId;
 const setName = (name) => _.escape(name).trim();
 
+// A station object with a name, number from 0 - 999, spotify URI, and user data
 const StationSchema = new mongoose.Schema({
   stationName: {
     type: String,
@@ -40,6 +41,7 @@ const StationSchema = new mongoose.Schema({
   },
 });
 
+// Readable station info
 StationSchema.statics.toAPI = (doc) => ({
   stationName: doc.stationName,
   stationNum: doc.stationNum,
@@ -47,6 +49,7 @@ StationSchema.statics.toAPI = (doc) => ({
   spotifyURI: doc.spotifyURI,
 });
 
+// Find a station from a UserID
 StationSchema.statics.findByCreator = (userID, callback) => {
   const search = {
     userID: convertId(userID),
@@ -55,13 +58,12 @@ StationSchema.statics.findByCreator = (userID, callback) => {
   return StationModel.find(search).select('name spotifyURI').lean().exec(callback);
 };
 
+// Find a station from a number
 StationSchema.statics.findStation = (num, callback) => {
   const search = {
     stationNum: num,
   };
 
-  // console.log(num);
-  // console.log(search);
   return StationModel.findOne(search, callback);
 };
 

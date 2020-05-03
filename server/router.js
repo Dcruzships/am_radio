@@ -6,11 +6,9 @@ const router = (app) => {
   app.post('/create', controllers.Music.createStation);
   app.get('/create', controllers.Music.createStation);
   app.post('/getStation', controllers.Music.getStation);
-  app.get('/getAll', controllers.Music.getAll);
   app.get('/login', controllers.Spotify.login);
   app.get('/callback', controllers.Spotify.callback);
   app.post('/callback', controllers.Spotify.callback);
-  // app.get('/getToken', controllers.Spotify.getToken);
 };
 
 module.exports = router;
