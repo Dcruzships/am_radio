@@ -154,7 +154,7 @@ const loadStation = (stationNum) =>
       let url = uriToUrl('https://open.spotify.com/embed/', currentStationObject.spotifyURI);
       let noEmbedURL = uriToUrl('https://open.spotify.com/', currentStationObject.spotifyURI);
       appWindow.innerHTML = `<iframe src=${url} frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`;
-      if(loaded) document.querySelector("#radioLabel").innerHTML = `<p>Now listening to: <a href=${noEmbedURL}>${currentStationName}</a></p>`;
+      if(loaded) document.querySelector("#radioLabel").innerHTML = `<p>Now listening to: <a href=${noEmbedURL} target='_blank'>${currentStationName}</a></p>`;
     }
     else
     {

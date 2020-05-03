@@ -11,7 +11,7 @@ const TopNav = (props) =>
     return(
       <div id="topNav">
         <a className="topNavLink" href="/" id="logo"><p>am_radio</p></a>
-        <a className="topNavLink" href="https://github.com/Dcruzships" id="logo"><p>by brandon dcruz</p></a>
+        <a className="topNavLink" href="https://github.com/Dcruzships" target='_blank' id="logo"><p>by brandon dcruz</p></a>
       </div>
     );
   }

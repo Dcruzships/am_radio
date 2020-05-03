@@ -1,13 +1,5 @@
 "use strict";
 
-var _this = void 0;
-
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 var handleError = function handleError(message) {
   $("#errorMessage").text(message);
 };
@@ -49,6 +41,7 @@ var sendAjax = function sendAjax(type, action, data, success) {
     }
   });
 };
+"use strict";
 
 var currentStation = 0;
 var lastStation = 0;
@@ -213,7 +206,7 @@ var loadStation = function loadStation(stationNum) {
       var url = uriToUrl('https://open.spotify.com/embed/', currentStationObject.spotifyURI);
       var noEmbedURL = uriToUrl('https://open.spotify.com/', currentStationObject.spotifyURI);
       appWindow.innerHTML = "<iframe src=".concat(url, " frameborder=\"0\" allowtransparency=\"true\" allow=\"encrypted-media\"></iframe>");
-      if (loaded) document.querySelector("#radioLabel").innerHTML = "<p>Now listening to: <a href=".concat(noEmbedURL, ">").concat(currentStationName, "</a></p>");
+      if (loaded) document.querySelector("#radioLabel").innerHTML = "<p>Now listening to: <a href=".concat(noEmbedURL, " target='_blank'>").concat(currentStationName, "</a></p>");
     } else {
       if (loaded) document.querySelector("#newStationForm").style.visibility = 'visible';
       appWindow.innerHTML = "<span><p id='errorMessage'>EMPTY STATION</p></span>";
@@ -234,8 +227,10 @@ $(document).ready(function () {
   window.onSpotifyWebPlaybackSDKReady = function () {
     init();
   };
-}); // This is where users login, links to account features. Sign in, sign out, create account
+});
+"use strict";
 
+// This is where users login, links to account features. Sign in, sign out, create account
 var TopNav = function TopNav(props) {
   var logout = function logout(e) {
     document.cookie = 'spotifyToken=';
@@ -253,6 +248,7 @@ var TopNav = function TopNav(props) {
       }, /*#__PURE__*/React.createElement("p", null, "am_radio")), /*#__PURE__*/React.createElement("a", {
         className: "topNavLink",
         href: "https://github.com/Dcruzships",
+        target: "_blank",
         id: "logo"
       }, /*#__PURE__*/React.createElement("p", null, "by brandon dcruz")))
     );
@@ -422,6 +418,7 @@ var handleNewStation = function handleNewStation(e) {
   });
   return false;
 };
+"use strict";
 
 var StationList = function StationList(props) {
   if (props.stations.length === 0) {
@@ -461,6 +458,15 @@ var getAllStations = function getAllStations() {
     }), document.querySelector("#window"));
   });
 };
+"use strict";
+
+var _this = void 0;
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var PlaylistCounter = function PlaylistCounter() {
   return (/*#__PURE__*/React.createElement("div", {
