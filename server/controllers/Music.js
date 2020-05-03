@@ -21,7 +21,7 @@ const createStation = (req, res) => {
   stationPromise.then(() => res.json({ redirect: '/' }));
 
   stationPromise.catch((err) => {
-    console.log(err);
+    // console.log(err);
     if (err.code === 11000) {
       return res.status(400).json({ error: 'Station already taken.' });
     }
@@ -47,7 +47,7 @@ const getStation = (req, res) => Station.StationModel.findStation(
 const getAll = (req, res) => Station.StationModel.findByOwner(
   req.session.account._id, (err, docs) => {
     if (err) {
-      console.log(err);
+      // console.log(err);
       return res.status(400).json({ error: 'An error occurred' });
     }
 

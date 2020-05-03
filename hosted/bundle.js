@@ -1,10 +1,15 @@
 "use strict";
 
+var _this = void 0;
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 var handleError = function handleError(message) {
   $("#errorMessage").text(message);
-  $("#errorMessage").animate({
-    opacity: 0.25
-  }, 350);
 };
 
 var redirect = function redirect(response) {
@@ -40,21 +45,21 @@ var sendAjax = function sendAjax(type, action, data, success) {
     dataType: "json",
     success: success,
     error: function error(xhr, status, _error) {
-      var messageObj = JSON.parse(xhr.responseText);
-      console.log(messageObj);
+      var messageObj = JSON.parse(xhr.responseText); // console.log(messageObj);
     }
   });
 };
-"use strict";
 
 var currentStation = 0;
 var lastStation = 0;
 var currentStationObject;
+var currentStationName = '';
 var currentVis = 0;
 var spotifyToken;
 var userPlaylists;
 var userID = "";
 var displayName = "";
+var imageID = "";
 var changeStation = false;
 var spotifyPlayer;
 var appWindow;
@@ -67,10 +72,10 @@ var init = function init() {
 
   if (spotifyToken == null) {
     spotifyToken = getCookie("spotifyToken");
-  }
+  } // currentStation = Math.floor(Math.random() * 990);
+  // currentStation = ('000' + currentStation).substr(-3);
 
-  currentStation = Math.floor(Math.random() * 990);
-  currentStation = ('000' + currentStation).substr(-3);
+
   currentStation = '749';
   lastStation = getCookie("lastStation");
 
@@ -82,7 +87,7 @@ var init = function init() {
     document.cookie = 'spotifyToken=';
     spotifyToken = null;
     ReactDOM.render( /*#__PURE__*/React.createElement("button", {
-      id: "#loginButton",
+      id: "loginButton",
       onClick: function onClick(e) {
         window.location = '/login';
         isLogged = true;
@@ -90,12 +95,12 @@ var init = function init() {
         return false;
       }
     }, "Login with Spotify"), document.querySelector('#window'));
+    ReactDOM.render( /*#__PURE__*/React.createElement(TopNav, null), document.querySelector('#topNav'));
   } else {
     document.querySelector("#window").innerHTML = "<h3><span id='errorMessage'></span></h3>";
     document.cookie = "spotifyToken=".concat(spotifyToken);
     appWindow = document.querySelector("#window");
     makeNav();
-    loadStation(currentStation); // createWindow();
   }
 };
 
@@ -105,10 +110,15 @@ var makeNav = function makeNav() {
       throw Error(response.statusText);
       document.cookie = 'spotifyToken=';
       spotifyToken = null;
-      location.reload();
+      window.location = '/';
     }
 
     return response;
+  }
+
+  function checkLoaded() {
+    loaded = true;
+    return loaded;
   }
 
   fetch('https://api.spotify.com/v1/me', {
@@ -124,7 +134,7 @@ var makeNav = function makeNav() {
     headers: {
       'Authorization': 'Bearer ' + spotifyToken
     }
-  }).then(function (response) {
+  }).then(handleErrors).then(function (response) {
     return response.json();
   }).then(function (playlistData) {
     var playlists = playlistData.items;
@@ -154,11 +164,11 @@ var makeNav = function makeNav() {
       return playlists;
     }).then(function (data) {
       return createRightNav(data);
+    }).then(loadStation(currentStation)).then(function (data) {
+      return createBotNav(data);
     });
     return playlistsPromise;
   });
-  createBotNav();
-  ReactDOM.render( /*#__PURE__*/React.createElement(LeftNav, null), document.querySelector('#leftNav'));
 };
 
 var createTopNav = function createTopNav(data) {
@@ -169,25 +179,26 @@ var createTopNav = function createTopNav(data) {
   }), document.querySelector('#topNav'));
 };
 
+var createBotNav = function createBotNav(data) {
+  ReactDOM.render( /*#__PURE__*/React.createElement(BotNav, {
+    text: "Now listening to: " + currentStationName
+  }), document.querySelector('#botNav'));
+};
+
 var createRightNav = function createRightNav(data) {
   userPlaylists = data;
-  ReactDOM.render( /*#__PURE__*/React.createElement(RightNav, {
+  ReactDOM.render( /*#__PURE__*/React.createElement(NewStationForm, {
     playlists: data
   }), document.querySelector('#rightNav'));
   loaded = true;
 };
 
-var createBotNav = function createBotNav() {
-  ReactDOM.render( /*#__PURE__*/React.createElement(BotNav, null), document.querySelector('#botNav'));
-};
-
 var loadStation = function loadStation(stationNum) {
   if (stationNum < 0 || stationNum > 999) {
-    console.log('error!');
+    document.querySelector("#window").innerHTML = "<h3><span id='errorMessage'>error</span></h3>";
     return;
   }
 
-  console.log("loading station ".concat(stationNum));
   currentStation = stationNum;
   lastStation = currentStation;
   var theStation = {
@@ -198,21 +209,22 @@ var loadStation = function loadStation(stationNum) {
       if (loaded) document.querySelector("#newStationForm").style.visibility = 'hidden';
       appWindow.innerHTML = '';
       currentStationObject = data.station;
-      var url = uriToUrl(currentStationObject.spotifyURI);
+      currentStationName = currentStationObject.stationName;
+      var url = uriToUrl('https://open.spotify.com/embed/', currentStationObject.spotifyURI);
+      var noEmbedURL = uriToUrl('https://open.spotify.com/', currentStationObject.spotifyURI);
       appWindow.innerHTML = "<iframe src=".concat(url, " frameborder=\"0\" allowtransparency=\"true\" allow=\"encrypted-media\"></iframe>");
+      if (loaded) document.querySelector("#radioLabel").innerHTML = "<p>Now listening to: <a href=".concat(noEmbedURL, ">").concat(currentStationName, "</a></p>");
     } else {
-      document.querySelector("#newStationForm").style.visibility = 'visible';
+      if (loaded) document.querySelector("#newStationForm").style.visibility = 'visible';
       appWindow.innerHTML = "<span><p id='errorMessage'>EMPTY STATION</p></span>";
+      if (loaded) document.querySelector("#radioLabel").innerHTML = "<p>BLANK STATION: Add one now!</p>";
     }
   });
+  return currentStationObject;
 };
 
-var createWindow = function createWindow(data) {
-  console.log(data);
-};
-
-var uriToUrl = function uriToUrl(uri) {
-  var finalURL = 'https://open.spotify.com/embed/';
+var uriToUrl = function uriToUrl(start, uri) {
+  var finalURL = start;
   var split = uri.split(':');
   finalURL += "".concat(split[1], "/").concat(split[2]);
   return finalURL;
@@ -222,38 +234,49 @@ $(document).ready(function () {
   window.onSpotifyWebPlaybackSDKReady = function () {
     init();
   };
-});
-"use strict";
+}); // This is where users login, links to account features. Sign in, sign out, create account
 
-// This is where users login, links to account features. Sign in, sign out, create account
 var TopNav = function TopNav(props) {
-  return (/*#__PURE__*/React.createElement("div", {
-      id: "topNav"
-    }, /*#__PURE__*/React.createElement("a", {
-      className: "topNavLink",
-      href: "/",
-      id: "logo"
-    }, "am_radio"), /*#__PURE__*/React.createElement("p", {
-      className: "topNavLink",
-      id: "name"
-    }, "Hello ", props.name))
-  );
+  var logout = function logout(e) {
+    document.cookie = 'spotifyToken=';
+    spotifyToken = null;
+    loaded = false;
+  };
+
+  if (props.name == null) {
+    return (/*#__PURE__*/React.createElement("div", {
+        id: "topNav"
+      }, /*#__PURE__*/React.createElement("a", {
+        className: "topNavLink",
+        href: "/",
+        id: "logo"
+      }, /*#__PURE__*/React.createElement("p", null, "am_radio")), /*#__PURE__*/React.createElement("a", {
+        className: "topNavLink",
+        href: "https://github.com/Dcruzships",
+        id: "logo"
+      }, /*#__PURE__*/React.createElement("p", null, "by brandon dcruz")))
+    );
+  } else {
+    return (/*#__PURE__*/React.createElement("div", {
+        id: "topNav"
+      }, /*#__PURE__*/React.createElement("a", {
+        className: "topNavLink",
+        href: "/",
+        id: "logo"
+      }, /*#__PURE__*/React.createElement("p", null, "am_radio")), /*#__PURE__*/React.createElement("p", {
+        className: "topNavLink",
+        id: "name"
+      }, "Hello ", props.name), /*#__PURE__*/React.createElement("a", {
+        className: "topNavLink",
+        id: "logout",
+        href: "/",
+        onClick: logout
+      }, /*#__PURE__*/React.createElement("p", null, "logout")))
+    );
+  }
 };
 
-var LeftNav = function LeftNav() {
-  return (/*#__PURE__*/React.createElement("div", {
-      id: "leftNav"
-    })
-  ); //
-  // <ul>
-  //   <li><a href="/all" className="leftNavLink">All</a></li>
-  //   <li><a href="/mine" className="leftNavLink">Mine</a></li>
-  //   <li><a href="/station" className="leftNavLink">Station</a></li>
-  // </ul>
-  // <div id="album"></div>
-};
-
-var RightNav = function RightNav(props) {
+var NewStationForm = function NewStationForm(props) {
   var handleChange = function handleChange(event) {
     event.value = event.target.value;
     event.target.name = 'spotifyURI';
@@ -277,7 +300,7 @@ var RightNav = function RightNav(props) {
     optionsArray.unshift( /*#__PURE__*/React.createElement("option", {
       key: undefined,
       value: undefined
-    }, "..."));
+    }, "Playlist..."));
     return optionsArray;
   };
 
@@ -291,16 +314,13 @@ var RightNav = function RightNav(props) {
     }, /*#__PURE__*/React.createElement("label", {
       className: "rightNavLink",
       id: "stationLabel"
-    }, "Station Name: "), /*#__PURE__*/React.createElement("input", {
+    }, "Station"), /*#__PURE__*/React.createElement("input", {
       className: "rightNavLink",
       id: "stationName",
       type: "text",
       name: "stationName",
-      placeholder: "My Radio 101"
-    }), /*#__PURE__*/React.createElement("label", {
-      className: "rightNavLink",
-      id: "playlistLabel"
-    }, "Playlist: "), /*#__PURE__*/React.createElement("select", {
+      placeholder: "Station Name"
+    }), /*#__PURE__*/React.createElement("select", {
       className: "rightNavLink",
       name: "spotifyURI",
       id: "spotifyURI",
@@ -309,7 +329,7 @@ var RightNav = function RightNav(props) {
       type: "hidden",
       id: "formUserID",
       name: "userID",
-      value: userID
+      value: displayName
     }), /*#__PURE__*/React.createElement("input", {
       type: "hidden",
       id: "formStationNum",
@@ -318,12 +338,12 @@ var RightNav = function RightNav(props) {
     }), /*#__PURE__*/React.createElement("input", {
       className: "createStationSubmit rightNavLink",
       type: "submit",
-      value: "Create Station"
+      value: "Create"
     })))
   );
 };
 
-var BotNav = function BotNav() {
+var BotNav = function BotNav(props) {
   var upStation = function upStation(e) {
     loadStation(parseInt(document.querySelector("#stationNum").innerHTML) + 1);
     document.querySelector("#stationNum").innerHTML = currentStation;
@@ -361,6 +381,13 @@ var BotNav = function BotNav() {
   };
 
   return (/*#__PURE__*/React.createElement("div", {
+      id: "botNav"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "botNavLink",
+      id: "radioLabel"
+    }, /*#__PURE__*/React.createElement("p", {
+      className: "botNavLink"
+    }, props.text)), /*#__PURE__*/React.createElement("div", {
       className: "botNavLink",
       id: "stationControls"
     }, /*#__PURE__*/React.createElement("img", {
@@ -377,7 +404,7 @@ var BotNav = function BotNav() {
       id: "prevStation",
       onClick: downStation,
       src: "https://img.icons8.com/material-two-tone/48/000000/double-left.png"
-    }))
+    })))
   );
 };
 
@@ -395,7 +422,6 @@ var handleNewStation = function handleNewStation(e) {
   });
   return false;
 };
-"use strict";
 
 var StationList = function StationList(props) {
   if (props.stations.length === 0) {
@@ -435,15 +461,6 @@ var getAllStations = function getAllStations() {
     }), document.querySelector("#window"));
   });
 };
-"use strict";
-
-var _this = void 0;
-
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var PlaylistCounter = function PlaylistCounter() {
   return (/*#__PURE__*/React.createElement("div", {

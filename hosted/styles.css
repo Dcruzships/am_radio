@@ -8,6 +8,22 @@
   align-items: center;
   justify-content: center; }
 
+/* unvisited link */
+a:link {
+  color: red; }
+
+/* visited link */
+a:visited {
+  color: red; }
+
+/* mouse over link */
+a:hover {
+  color: orange; }
+
+/* selected link */
+a:active {
+  color: blue; }
+
 #screen {
   margin: 10px;
   background-color: white;
@@ -17,6 +33,18 @@
   display: flex;
   align-items: center;
   justify-content: center; }
+
+#loginButton {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer; }
 
 #window {
   position: absolute;
@@ -47,30 +75,23 @@
   #Nav .nav {
     color: black;
     font-size: 30px; }
-  #Nav .topNavLink .leftNavLink .rightNav .topNavLink {
+  #Nav .topNavLink .botNavLink .rightNav {
     display: flex;
     flex-direction: row; }
   #Nav .rightNavLink {
-    font-size: 16px; }
+    font-size: 15px;
+    margin: 5px; }
 
 #topNav {
   position: fixed;
-  width: 98vw;
+  width: 90vw;
   height: 11.90476vh;
   display: flex;
   flex-direction: row;
   align-content: center;
-  justify-content: center; }
-  #topNav #logo {
-    position: fixed;
-    left: 1.5em;
-    top: 5.95238vh; }
-
-#leftNav {
-  position: fixed;
-  top: 14.70588vh;
-  width: 6.2%;
-  height: 70vh; }
+  justify-content: space-between;
+  margin-left: 35px;
+  margin-right: 35px; }
 
 #rightNav {
   position: fixed;
@@ -78,20 +99,29 @@
   left: 92.5vw;
   width: 6.2%;
   height: 70vh;
-  visibility: hidden; }
+  visibility: hidden;
+  text-align: center; }
+  #rightNav #stationLabel {
+    text-decoration: underline; }
+  #rightNav input, #rightNav select, #rightNav button {
+    width: 100%; }
 
 #botNav {
   position: fixed;
   top: 85vh;
-  width: 98vw;
+  width: 90vw;
   height: 11.90476vh;
   display: flex;
-  flex-direction: row-reverse;
-  align-items: center; }
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-left: 35px; }
+  #botNav #radioLabel {
+    display: flex;
+    flex-direction: row; }
   #botNav #stationControls {
     display: flex;
-    flex-direction: row-reverse;
-    margin-right: 25px; }
+    flex-direction: row-reverse; }
     #botNav #stationControls #prevStation:hover {
       cursor: pointer;
       width: 55px; }

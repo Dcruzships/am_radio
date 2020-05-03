@@ -1,11 +1,13 @@
 let currentStation = 0;
 let lastStation = 0;
 let currentStationObject;
+let currentStationName = '';
 let currentVis = 0;
 let spotifyToken;
 let userPlaylists;
 let userID = "";
 let displayName = "";
+let imageID = "";
 let changeStation = false;
 let spotifyPlayer;
 let appWindow;
@@ -21,8 +23,8 @@ const init = () =>
     spotifyToken = getCookie("spotifyToken");
   }
 
-  currentStation = Math.floor(Math.random() * 990);
-  currentStation = ('000' + currentStation).substr(-3);
+  // currentStation = Math.floor(Math.random() * 990);
+  // currentStation = ('000' + currentStation).substr(-3);
   currentStation = '749';
   lastStation = getCookie("lastStation");
   if(lastStation != 0) { currentStation = lastStation; }
@@ -33,7 +35,7 @@ const init = () =>
     spotifyToken = null;
 
     ReactDOM.render(
-        <button id="#loginButton" onClick={(e) =>
+        <button id="loginButton" onClick={(e) =>
           {
             window.location = ('/login');
             isLogged = true;
@@ -41,6 +43,8 @@ const init = () =>
             return false;
           }
       }>Login with Spotify</button>, document.querySelector('#window'));
+
+      ReactDOM.render(<TopNav />, document.querySelector('#topNav'));
   }
   else
   {
@@ -49,8 +53,6 @@ const init = () =>
     appWindow = document.querySelector("#window");
 
     makeNav();
-    loadStation(currentStation);
-    // createWindow();
   }
 };
 
@@ -61,9 +63,14 @@ const makeNav = () =>
         throw Error(response.statusText);
         document.cookie = 'spotifyToken=';
         spotifyToken = null;
-        location.reload();
+        window.location = '/';
     }
     return response;
+  }
+
+  function checkLoaded() {
+    loaded = true;
+    return loaded;
   }
 
   fetch('https://api.spotify.com/v1/me', {
@@ -73,7 +80,7 @@ const makeNav = () =>
 
   fetch('https://api.spotify.com/v1/me/playlists', {
     headers: {'Authorization': 'Bearer ' + spotifyToken}
-  }).then(response => response.json())
+  }).then(handleErrors).then(response => response.json())
   .then(playlistData => {
     let playlists = playlistData.items;
     let trackDataPromises = playlists.map(playlist => {
@@ -96,41 +103,38 @@ const makeNav = () =>
           }))
       })
       return playlists;
-    }).then(data => createRightNav(data))
+    }).then(data => createRightNav(data)).then(loadStation(currentStation)).then(data => createBotNav(data))
     return playlistsPromise;
   });
-
-  createBotNav();
-  ReactDOM.render(<LeftNav />, document.querySelector('#leftNav'));
 };
 
 const createTopNav = (data) =>
 {
   userID = data.id;
   displayName = data.display_name;
+
   ReactDOM.render(<TopNav name={data.display_name} />, document.querySelector('#topNav'));
+};
+
+const createBotNav = (data) =>
+{
+  ReactDOM.render(<BotNav text={"Now listening to: " + currentStationName} />, document.querySelector('#botNav'));
 };
 
 const createRightNav = (data) =>
 {
   userPlaylists = data;
-  ReactDOM.render(<RightNav playlists={data} />, document.querySelector('#rightNav'));
+  ReactDOM.render(<NewStationForm playlists={data} />, document.querySelector('#rightNav'));
   loaded = true;
-};
-
-const createBotNav = () =>
-{
-  ReactDOM.render(<BotNav />, document.querySelector('#botNav'));
 };
 
 const loadStation = (stationNum) =>
 {
   if(stationNum < 0 || stationNum > 999)
   {
-    console.log('error!');
+    document.querySelector("#window").innerHTML = "<h3><span id='errorMessage'>error</span></h3>";
     return;
   }
-  console.log(`loading station ${stationNum}`);
   currentStation = stationNum;
   lastStation = currentStation;
 
@@ -143,26 +147,28 @@ const loadStation = (stationNum) =>
   {
     if(data.station != null)
     {
-      if(loaded)document.querySelector("#newStationForm").style.visibility = 'hidden';
+      if(loaded) document.querySelector("#newStationForm").style.visibility = 'hidden';
       appWindow.innerHTML = '';
       currentStationObject = data.station;
-      let url = uriToUrl(currentStationObject.spotifyURI);
+      currentStationName = currentStationObject.stationName;
+      let url = uriToUrl('https://open.spotify.com/embed/', currentStationObject.spotifyURI);
+      let noEmbedURL = uriToUrl('https://open.spotify.com/', currentStationObject.spotifyURI);
       appWindow.innerHTML = `<iframe src=${url} frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`;
+      if(loaded) document.querySelector("#radioLabel").innerHTML = `<p>Now listening to: <a href=${noEmbedURL}>${currentStationName}</a></p>`;
     }
     else
     {
-      document.querySelector("#newStationForm").style.visibility = 'visible';
+      if(loaded) document.querySelector("#newStationForm").style.visibility = 'visible';
       appWindow.innerHTML = `<span><p id='errorMessage'>EMPTY STATION</p></span>`;
+      if(loaded) document.querySelector("#radioLabel").innerHTML = `<p>BLANK STATION: Add one now!</p>`;
     }
   });
+
+  return currentStationObject;
 };
 
-const createWindow = (data) => {
-  console.log(data);
-};
-
-const uriToUrl = (uri) => {
-  let finalURL = 'https://open.spotify.com/embed/';
+const uriToUrl = (start, uri) => {
+  let finalURL = start;
   let split = uri.split(':');
   finalURL += `${split[1]}/${split[2]}`;
   return finalURL;

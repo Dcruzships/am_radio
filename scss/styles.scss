@@ -18,6 +18,26 @@ $fontNav: 'Roboto Mono';
   justify-content: center;
 }
 
+/* unvisited link */
+a:link {
+  color: red;
+}
+
+/* visited link */
+a:visited {
+  color: red;
+}
+
+/* mouse over link */
+a:hover {
+  color: orange;
+}
+
+/* selected link */
+a:active {
+  color: blue;
+}
+
 #screen {
   margin: 10px;
   background-color: $navColor;
@@ -27,6 +47,19 @@ $fontNav: 'Roboto Mono';
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+#loginButton {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
 }
 
 #window {
@@ -66,35 +99,28 @@ $fontNav: 'Roboto Mono';
     color: $bgColor;
     font-size: 30px;
   }
-  .topNavLink .leftNavLink .rightNav .topNavLink {
+  .topNavLink .botNavLink .rightNav {
     display: flex;
     flex-direction: row;
   }
   .rightNavLink {
-    font-size: 16px;
+    font-size: 15px;
+    margin: 5px;
   }
 }
 
 #topNav {
   position: fixed;
-  width: $appWidth;
+  width: $appWidth - 8vw;
   height: ($appHeight - $windowHeight) / 2.1;
   display: flex;
   flex-direction: row;
   align-content: center;
-  justify-content: center;
-  #logo {
-    position: fixed;
-    left: 1.5em;
-    top: (($appHeight - $windowHeight) / 2.1) / 2;
-  }
+  justify-content: space-between;
+  margin-left: 35px;
+  margin-right: 35px;
 }
-#leftNav {
-  position: fixed;
-  top: ($appHeight - $windowHeight) / 1.7;
-  width: 6.2%;
-  height: $windowHeight;
-}
+
 #rightNav {
   position: fixed;
   top: ($appHeight - $windowHeight) / 1.7;
@@ -102,20 +128,35 @@ $fontNav: 'Roboto Mono';
   width: 6.2%;
   height: $windowHeight;
   visibility: hidden;
+  text-align: center;
+  #stationLabel {
+    text-decoration: underline;
+  }
+  input, select, button {
+    width: 100%;
+  }
 }
+
 #botNav {
   position: fixed;
   top: $appHeight - 10vh;
-  width: $appWidth;
+  width: $appWidth - 8vw;
   height: ($appHeight - $windowHeight) / 2.1;
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
+  justify-content: space-between;
   align-items: center;
+  margin-left: 35px;
+
+  #radioLabel {
+    display: flex;
+    flex-direction: row;
+  }
 
   #stationControls {
     display: flex;
     flex-direction: row-reverse;
-    margin-right: 25px;
+
     #prevStation:hover {
       cursor: pointer;
       width: 55px;

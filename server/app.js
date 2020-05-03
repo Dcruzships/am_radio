@@ -27,7 +27,7 @@ const mongooseOptions = {
 // Here we have traded out mongoURI for our config.connecctions.mongo
 mongoose.connect(config.connections.mongo, mongooseOptions, (err) => {
   if (err) {
-    console.log('Could not connect to database');
+    // console.log('Could not connect to database');
     throw err;
   }
 });
@@ -68,5 +68,5 @@ app.listen(port, (err) => {
   if (err) {
     throw err;
   }
-  console.log(`Listening on port ${port}`);
+  // console.log(`Listening on port ${port}`);
 });

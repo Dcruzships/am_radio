@@ -1,6 +1,5 @@
 const handleError = (message) => {
   $("#errorMessage").text(message);
-  $("#errorMessage").animate({opacity: 0.25,}, 350);
 };
 
 const redirect = (response) => {
@@ -33,7 +32,7 @@ const sendAjax = (type, action, data, success) => {
     success: success,
     error: function(xhr, status, error) {
       var messageObj = JSON.parse(xhr.responseText);
-      console.log(messageObj);
+      // console.log(messageObj);
     }
   });
 };

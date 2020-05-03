@@ -1,30 +1,32 @@
 // This is where users login, links to account features. Sign in, sign out, create account
 const TopNav = (props) =>
 {
-  return(
-    <div id="topNav">
-      <a className="topNavLink" href="/" id="logo">am_radio</a>
-      <p className="topNavLink" id="name">Hello {props.name}</p>
-    </div>
-  );
+  const logout = (e) =>
+  {
+    document.cookie = 'spotifyToken=';
+    spotifyToken = null;
+    loaded = false;
+  }
+  if(props.name == null) {
+    return(
+      <div id="topNav">
+        <a className="topNavLink" href="/" id="logo"><p>am_radio</p></a>
+        <a className="topNavLink" href="https://github.com/Dcruzships" id="logo"><p>by brandon dcruz</p></a>
+      </div>
+    );
+  }
+  else {
+    return(
+      <div id="topNav">
+        <a className="topNavLink" href="/" id="logo"><p>am_radio</p></a>
+        <p className="topNavLink" id="name">Hello {props.name}</p>
+        <a className="topNavLink" id="logout" href='/' onClick={logout}><p>logout</p></a>
+      </div>
+    );
+  }
 };
 
-const LeftNav = () =>
-{
-  return (
-    <div id="leftNav">
-    </div>
-  );
-  //
-  // <ul>
-  //   <li><a href="/all" className="leftNavLink">All</a></li>
-  //   <li><a href="/mine" className="leftNavLink">Mine</a></li>
-  //   <li><a href="/station" className="leftNavLink">Station</a></li>
-  // </ul>
-  // <div id="album"></div>
-};
-
-const RightNav = (props) =>
+const NewStationForm = (props) =>
 {
   const handleChange = (event) =>
   {
@@ -45,7 +47,7 @@ const RightNav = (props) =>
       playlistIDs.push(props.playlists[i].uri);
       optionsArray.push(<option key={playlistNames[i]} value={playlistIDs[i]}>{playlistNames[i]}</option>);
     }
-    optionsArray.unshift(<option key={undefined} value={undefined}>...</option>);
+    optionsArray.unshift(<option key={undefined} value={undefined}>Playlist...</option>);
 
     return optionsArray;
   }
@@ -59,21 +61,20 @@ const RightNav = (props) =>
             method="POST"
             className="stationForm rightNavLink"
       >
-        <label className='rightNavLink' id="stationLabel">Station Name: </label>
-        <input className='rightNavLink' id="stationName" type="text" name="stationName" placeholder="My Radio 101"/>
-        <label className='rightNavLink' id="playlistLabel">Playlist: </label>
-          <select className='rightNavLink' name="spotifyURI" id="spotifyURI" onChange={handleChange}>
-            {buildOptions()}
-          </select>
-        <input type="hidden" id="formUserID" name="userID" value={userID}/>
+        <label className='rightNavLink' id="stationLabel">Station</label>
+        <input className='rightNavLink' id="stationName" type="text" name="stationName" placeholder="Station Name"/>
+        <select className='rightNavLink' name="spotifyURI" id="spotifyURI" onChange={handleChange}>
+          {buildOptions()}
+        </select>
+        <input type="hidden" id="formUserID" name="userID" value={displayName}/>
         <input type="hidden" id="formStationNum" name="stationNum" value={currentStation}/>
-        <input className="createStationSubmit rightNavLink" type="submit" value="Create Station"/>
+        <input className="createStationSubmit rightNavLink" type="submit" value="Create"/>
       </form>
     </div>
   );
 };
 
-const BotNav = () =>
+const BotNav = (props) =>
 {
   const upStation = (e) => {
     loadStation(parseInt(document.querySelector("#stationNum").innerHTML) + 1);
@@ -111,10 +112,16 @@ const BotNav = () =>
   };
 
   return (
-    <div className="botNavLink" id='stationControls'>
-      <img className="botNavLink" id="nextStation" onClick={upStation} src="https://img.icons8.com/material-two-tone/48/000000/double-right.png"></img>
-      <div className="botNavLink" id="stationNum" onClick={allowStationChange}>{currentStation}</div>
-      <img className="botNavLink" id="prevStation" onClick={downStation} src="https://img.icons8.com/material-two-tone/48/000000/double-left.png"></img>
+    <div id="botNav">
+      <div className="botNavLink" id='radioLabel'>
+        <p className="botNavLink">{props.text}</p>
+      </div>
+
+      <div className="botNavLink" id='stationControls'>
+        <img className="botNavLink" id="nextStation" onClick={upStation} src="https://img.icons8.com/material-two-tone/48/000000/double-right.png"></img>
+        <div className="botNavLink" id="stationNum" onClick={allowStationChange}>{currentStation}</div>
+        <img className="botNavLink" id="prevStation" onClick={downStation} src="https://img.icons8.com/material-two-tone/48/000000/double-left.png"></img>
+      </div>
     </div>
   );
 };
